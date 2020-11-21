@@ -149,15 +149,14 @@ if __name__ == '__main__':
     # i = marioBot.setLED(1,0,0)
 
     marioBot.startCom()
-    marioBot.endCom()
 
-    # c =''
-    # while True:
-    #     c = input()
+    c =''
+    while True:
+        c = input()
 
-    #     if c != 'exit':
-    #         print(f'Valeur de la consigne {c}')
-    #         marioBot.setManualCtrl(c)
-    #     else :
-    #         marioBot.endCom()
-    #         exit()            
+        if c != 'exit':
+            print(f'Valeur de la consigne {c}')
+            marioBot.setManualCtrl(c)
+        else :
+            marioBot.endCom()
+            exit()            
