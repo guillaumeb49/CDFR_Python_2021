@@ -134,9 +134,11 @@ class lowLevelCom :
     
     def comStep(self):
         while len(self.questions) > 0 :
+            ts = time.time()
             ans = self.exchangeTCP_Frame(self.questions[0])
+            tend = time.time()
             self.questions.pop(0)
-            print(ans)      
+            print("time: "+str(tend-ts) + "and:"+str(ans))      
 
 if __name__ == '__main__':
     marioBot = Robot_Interface()
