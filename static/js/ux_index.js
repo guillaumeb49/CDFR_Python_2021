@@ -69,7 +69,7 @@ $( "#index_strategy2_card" ).on( "click", function() {
 
 async function checkSocketUI(){
   var socket_status = checkSocket();
-
+  console.log("Hello World");
   if(socket_status == "OPEN")
   {
     $("#connection_status_bubble").removeClass("red");
@@ -104,7 +104,7 @@ async function checkSocketUI(){
   {
     // try to open the connection
       // initialize the websockets
-      initWebSocket();
+      //initWebSocket();
 
       $("#connection_status_bubble").removeClass("red");
       $("#connection_status_bubble").removeClass("green");

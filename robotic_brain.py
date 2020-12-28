@@ -1,22 +1,6 @@
-import eventlet
-eventlet.monkey_patch()
-
-
-from flask import Flask, render_template, Response
-from flask_socketio import SocketIO, emit
-from flask import current_app 
-import datetime
-from queue import Queue
-import threading
-import socket
-from time import sleep
-import json
-import pickle
-from flask import g
 
 import numpy as np
 from robotic_basics import Point, Rect, State
-
 
 
 class Strategy:
@@ -193,3 +177,16 @@ class Action(State):
 
     def setGain(self, gain):
         self.price = gain
+
+    def ShareRobotsUI(self):
+
+    def GetInputUI(self):
+
+
+
+
+
+if __name__ == "__main__":
+   
+
+   

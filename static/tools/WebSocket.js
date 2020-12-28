@@ -5,45 +5,10 @@
  * @author Guillaume B.
  */
 
- var socket = null;
- var robot = new Robot();
-
-$(document).ready(function(){
-    socket = io.connect('http://' + document.domain + ':' + location.port);
-    
-    socket.on( 'connect', function() {
-        socket.emit( 'connected', {
-          data: 'User Connected'
-        } )
-        
-      } )
-
-      // Every 500ms ask current status of Robot
-    window.setInterval(function(){
-        if(socket != null)
-        {
-            //if soketIO is active
-        socket.emit( 'my event', {cmd: 'getInfo'} )
-        
-        }
-    }, 250);
-
-      socket.on( 'my response', function( msg ) {
-        console.log( msg )
-            // If response if answering a getInfo request
-            if(msg.cmd == "getInfo")
-            {
-                // Update the robotUI
-                robot.setInfo(msg.current_position, msg.vecteurDeplacement,msg.next_position,msg.asservissement_status,msg.ready_to_start,msg.distances,msg.tirette_status, msg.leds, msg.servos_position)
-            }    
-    
-    })
-    
-});
 
 
+var socketio = null;
 
-var id_cmd = 0;
 
 function debug(message) {
     var dt = new Date();
@@ -65,94 +30,71 @@ function sendMessage(cmd, param1,param2,param3) {
         date: Date.now()
       };
     
-    if ( websocket != null )
+    if ( socketio != null )
     {
-        websocket.send( JSON.stringify(msg));
+        socketio.send( JSON.stringify(msg));
         id_cmd++;
     }
 }
 
-var wsUri = "ws://robot.local:1234";
-var websocket = null;
+var old_x = 0;
+ var old_y = 0;
 
 function initWebSocket() {
-    try {
-        if (typeof MozWebSocket == 'function')
-            WebSocket = MozWebSocket;
-        if ( websocket && websocket.readyState == 1 )
-            websocket.close();
-        websocket = new WebSocket( wsUri );
-        websocket.onopen = function (evt) {$(document).ready(function(){
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-    socket.on('my response', function(msg) {
-        $('#log').append('<p>Received: ' + msg.data + '</p>');
-    });
-    $('form#emit').submit(function(event) {
-        socket.emit('my event', {data: $('#emit_data').val()});
-        return false;
-    });
-    $('form#broadcast').submit(function(event) {
-        socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
-        return false;
-    });
-});
-            debug("CONNECTED");
-        };
-        websocket.onclose = function (evt) {
-            debug("DISCONNECTED");
-        };
-        websocket.onmessage = function (evt) {
-            console.log( "Message received :", evt.data );
-            debug(evt.data);
-            var data_received = JSON.parse(evt.data)
-            if(data_received["cmd"] == "getInfo")
-            {
-                robot.setDistances(data_received["answer"]);
-            }
+    $( document ).ready(function() {
+        socketio = io();
+        socketio.on('connect', function() {
+            socketio.emit('my event', {data: 'I\'m connected!'});
+        });
 
-            console.log(robot.getDistances());
-
+        socketio.on('new_status_data', (data) => {
             
-        };
-        websocket.onerror = function (evt) {
-            debug('ERROR: ' + evt.data);
-        };
-    } catch (exception) {
-        debug('ERROR: ' + exception);
-    }
+
+            if($( "#table_chronology" ).length)
+            {
+                $("#table_chronology>tbody").prepend("<tr>\
+                <td data-label='TimeStamp'>"+data["timestamp"]+"</td>\
+                <td data-label='Robot'>"+data["robotid"]+"</td>\
+                <td data-label='Position'>x:"+data["x"]+" y:"+data["y"]+" theta:"+data["theta"]+"</td>\
+                <td data-label='Distance'>"+data["distance 1"]+data["distance 2"]+data["distance 3"]+data["distance 4"]+data["distance 5"]+data["distance 6"]+"</td>\
+              </tr>");
+            }
+            
+            DrawRobotPosition(data["x"],data["y"],old_x,old_y)
+            old_x = data["x"];
+            old_y = data["y"];
+            console.log(data);
+          });
+
+      });
+    
 }
 
 function stopWebSocket() {
-    if (websocket)
-        websocket.close();
+    if (socketio)
+    socketio.close();
 }
 
 function checkSocket() {
-    if (websocket != null) {
+    console.log("socketio "+socketio);
+    if (socketio != null) {
         var stateStr;
-        switch (websocket.readyState) {
-            case 0: {
-                stateStr = "CONNECTING";
-                break;
-            }
-            case 1: {
+        switch (socketio.connected) {
+            case true: {
                 stateStr = "OPEN";
                 break;
             }
-            case 2: {
-                stateStr = "CLOSING";
-                break;
-            }
-            case 3: {
+            case false: {
                 stateStr = "CLOSED";
                 break;
             }
+            
             default: {
                 stateStr = "UNKNOW";
                 break;
             }
         }
-        debug("WebSocket state = " + websocket.readyState + " ( " + stateStr + " )");
+        debug("WebSocket socketio.connected = " + socketio.connected + " ( " + stateStr + " )");
     } else {
         debug("WebSocket is null");
         stateStr = "NULL"

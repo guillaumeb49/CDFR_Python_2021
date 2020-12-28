@@ -4,21 +4,48 @@
 
     <div class="ui column centered grid">
 
-        <div id="viewport_map">
-            <canvas id="canvas_layer1" style="z-index: 0;"></canvas>
-            <canvas id="canvas_layer2" style="z-index: 2;"></canvas>  
-            <canvas id="canvas_layer3" style="z-index: 1;"></canvas>  
+        <div id="viewport">
+            <canvas id="canvas_layer1_index" style="z-index: 0;"></canvas>
+            <canvas id="canvas_layer2_index" style="z-index: 2;"></canvas>  
+            <canvas id="canvas_layer3_index" style="z-index: 1;"></canvas>
+            <canvas id="canvas_layer4_index" style="z-index: 3;"></canvas>    
         </div>
    
+    </div>
+
+    <div class="ui column centered grid">
+        <table id="table_chronology" class="ui celled table">
+            <thead>
+              <tr><th>TimeStamp</th>
+              <th>Robot</th>
+              <th>Position</th>
+              <th>Distance</th>
+            </tr></thead>
+            <tbody id="body_chronology">
+              
+            </tbody>
+          </table>
     </div>
     
 
 
 
 <script type="text/javascript">
-DrawMap();
+
+
+
+DrawMap("../static/img/TableCDFR2020.png");
 DrawInitialItems();
-drawBoard();</script>
+drawBoard();
+MapEventManager();
+
+
+
+
+
+
+
+</script>
 
 {% endblock %}
 

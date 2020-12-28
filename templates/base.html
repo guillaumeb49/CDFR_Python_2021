@@ -20,7 +20,13 @@
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='semantic/dist/semantic.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js" integrity="sha512-AcZyhRP/tbAEsXCCGlziPun5iFvcSUpEz2jKkx0blkYKbxU81F+iq8FURwPn1sYFeksJ+sDDrI5XujsqSobWdQ==" crossorigin="anonymous"></script>
+
+<script src="{{ url_for('static', filename='js/Robot_Class.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ux_index.js') }}"></script>
+<script src="{{ url_for('static', filename='tools/WebSocket.js') }}"></script>
+<script src="{{ url_for('static', filename='tools/maps.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
 
 </head>
 
@@ -96,20 +102,17 @@
 
 
 </body>
-<script src="{{ url_for('static', filename='js/Robot_Class.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ux_index.js') }}"></script>
-<script src="{{ url_for('static', filename='tools/maps.js') }}"></script>
-<script src="{{ url_for('static', filename='tools/WebSocket.js') }}"></script>
-<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+
 
 <!--
   If index page -> Draw the Map 
 -->
 {% if request.url_rule.endpoint == "index" %}
   <script type="text/javascript">
-    DrawMap();
+    DrawMap("../static/img/TableCDFR2020.png");
     DrawInitialItems();
     drawBoard();
+    MapEventManager()
   </script>
 {% endif %}
 
@@ -118,8 +121,6 @@
 {% endif %}
 <!-- Always run these functions-->
 <script type="text/javascript">
-
-
 
   // initialize the websockets
   initWebSocket();
