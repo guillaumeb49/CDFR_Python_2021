@@ -112,7 +112,7 @@ class CircularItem
 }
 
 
-class Sensor{
+/*class Sensor{
 
     x = 0;
     y = 0;
@@ -262,6 +262,10 @@ class RobotDrawing
     y = 0;
     theta = 0;
 
+    next_x = 0;
+    next_y = 0;
+    next_theta = 0;
+
     size = 0;
     size_flash = 0;
     direction = 0;
@@ -269,6 +273,7 @@ class RobotDrawing
 
     dx = 1;
     dy = 1;
+    dtheta = 1;
 
     distances = {'sensor1':0,'sensor2':0,'sensor3':0,'sensor4':0,'sensor5':0,'sensor6':0,};
 
@@ -281,6 +286,10 @@ class RobotDrawing
         this.y = new_y;
         this.theta = new_theta;
         this.size = new_size;
+
+        this.next_x = this.x;
+        this.next_y = this.y;
+        this.next_theta = this.theta;
 
         this.id_layer1   = id_layer1_new; 
 
@@ -354,12 +363,7 @@ class RobotDrawing
             ctx.fill();
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            
-           
-
-            
+            ctx.stroke();            
           
             
         }
@@ -368,35 +372,72 @@ class RobotDrawing
     Update()
     {
 
-        var width = 100;
-        
+       
         // Get Distance Sensor
         var distance_sensor1 = this.distances['sensor1'];
         // Calculate step to Distance Sensor
        console.log(distance_sensor1);
         
-        if((this.size) >= distance_sensor1) 
+        var mov_x = this.x;
+        var mov_y = this.y;
+
+        if(Math.abs(this.x-this.next_x) >= 10) 
         {
-            this.size = this.size; // keep same size
-            this.size_flash += this.direction*this.dx;
+            if(this.x > this.next_x)
+            {
+                this.x -= this.dx; 
+            }
+            else
+            {
+                this.x += this.dx;
+            }
+
         }
 
-        if((this.size) < distance_sensor1) 
+        if(Math.abs(this.y-this.next_y) >= 10) 
         {
-            this.size += this.dx; // keep same size
-            this.size_flash += this.direction*this.dx;
+            if(this.y > this.next_y)
+            {
+                this.y -= this.dy; 
+            }
+            else
+            {
+                this.y += this.dy;
+            }
+
         }
 
-        if(this.size_flash >=this.size)
+        mov_x = mov_x - this.x;
+        mov_y = mov_y - this.y;
+        
+
+        if((mov_x != 0) || (mov_y != 0))
         {
-            this.size_flash -=this.dx;
-            this.direction = -3;
+            
+            if(mov_x == 0)
+            {
+                this.theta = Math.atan(0)*180/Math.PI;
+            }
+            else
+            {
+                this.theta = Math.atan(mov_y/mov_x)*180/Math.PI;
+            }
+            
         }
-        if(this.size_flash <=35)
+        else if(Math.abs(this.theta-this.next_theta) >= 1.5) 
         {
-            this.size_flash +=this.dx;
-            this.direction = 3;
+            if(this.theta > this.next_theta)
+            {
+                this.theta-= this.dy; 
+            }
+            else
+            {
+                this.theta += this.dy;
+            }
+
         }
+             
+        
 
     }
 
@@ -405,13 +446,19 @@ class RobotDrawing
         
         this.Draw();
         this.Update();
-        //requestAnimationFrame(this.Animate.bind(this));
+        requestAnimationFrame(this.Animate.bind(this));
+    }
+
+    MoveTo(new_x,new_y,new_theta)
+    {
+        this.next_x = new_x;
+        this.next_y = new_y;
+        this.next_theta = new_theta;
     }
 
 
-
 }
-
+*/
 
 class Map{
 
