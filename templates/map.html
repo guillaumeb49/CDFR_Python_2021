@@ -5,10 +5,11 @@
     <div class="ui column centered grid">
 
         <div id="viewport">
-            <canvas id="canvas_layer1_index" style="z-index: 0;"></canvas>
+            <canvas id="canvas_layer1_index" style="z-index: 1;"></canvas>
             <canvas id="canvas_layer2_index" style="z-index: 2;"></canvas>  
-            <canvas id="canvas_layer3_index" style="z-index: 1;"></canvas>
-            <canvas id="canvas_layer4_index" style="z-index: 3;"></canvas>    
+            <canvas id="canvas_layer3_index" style="z-index: 3;"></canvas>
+            <canvas id="canvas_layer4_index" style="z-index: 4;"></canvas>   
+            <canvas id="canvas_layer5_index" style="z-index: 5;"></canvas>  
         </div>
    
     </div>
@@ -32,13 +33,58 @@
 
 <script type="text/javascript">
 
+var map = new Map("../static/img/TableCDFR2020.png", "canvas_layer1_index", "canvas_layer2_index", "canvas_layer3_index", "canvas_layer4_index");
+map.DrawMap();
+map.DrawBoard();
+map.AddItem("Item1", 670,100,10,"Test 1",'#006f3d');
+map.AddItem("Item2", 1005,400,10,"Test 2",'#bb1e10');
+map.AddItem("Item2", 1100,800,10,"Test 2",'#bb1e10');
+map.AddItem("Item2", 1730,1200,10,"Test 2",'#bb1e10');
+map.DrawItems();
 
 
-DrawMap("../static/img/TableCDFR2020.png");
-DrawInitialItems();
-drawBoard();
-MapEventManager();
+map.AddRobotItem("Guillaume", 500,500);
+map.AddRobotItem("Guillaume", 600,600);
+map.AddRobotItem("Guillaume", 700,700);
+map.AddRobotItem("Guillaume", 750,700);
+map.AddRobotItem("Guillaume", 800,700);
+map.AddRobotItem("Guillaume", 850,700);
+map.AddRobotItem("Guillaume", 900,700);
+map.AddRobotItem("Guillaume", 950,700);
+map.AddRobotItem("Guillaume", 1000,700);
+map.AddRobotItem("Guillaume", 1050,700);
+map.AddRobotItem("Guillaume", 1200,700);
+map.AddRobotItem("Guillaume", 1250,750);
+map.AddRobotItem("Guillaume", 1400,800);
+map.AddRobotItem("Guillaume", 1600,900);
+map.AddRobotItem("Guillaume", 1700,1000);
+map.AddRobotItem("Guillaume", 1700,1400);
+map.AddRobotItem("Guillaume", 1750,1600);
+map.AddRobotItem("Guillaume", 1600,1200);
+map.AddRobotItem("Guillaume", 500,800);
+map.AddRobotItem("Guillaume", 500,900);
+map.AddRobotItem("Guillaume", 500,1000);
+map.AddRobotItem("Guillaume", 500,1100);
+map.AddRobotItem("Guillaume", 500,1200);
+map.AddRobotItem("Guillaume", 500,1400);
+map.AddRobotItem("Guillaume", 500,1600);
+map.AddRobotItem("Guillaume", 500,1800);
+map.AddRobotItem("Guillaume", 700,1000);
+map.AddRobotItem("Guillaume", 800,1100);
+map.AddRobotItem("Guillaume", 1000,1100);
+map.AddRobotItem("Guillaume", 1100,1100);
+map.AddRobotItem("Guillaume", 1500,1100);
+map.AddRobotItem("Guillaume", 2000,1100);
 
+//map.DrawRobotPositions();
+//DrawMap("../static/img/TableCDFR2020.png");
+//DrawInitialItems();
+//drawBoard();
+//MapEventManager();
+
+var robotdrawing = new RobotDrawing("Guillaume", 500, 100, 90, 0, {'sensor1':100,'sensor2':0,'sensor3':0,'sensor4':0,'sensor5':0,'sensor6':0,}, "canvas_layer5_index");
+
+robotdrawing.Animate();
 
 
 

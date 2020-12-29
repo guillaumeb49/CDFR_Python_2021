@@ -6,6 +6,44 @@
  */
 
 
+class RobotItem{
+
+    x = 0;
+    y = 0;
+    size = 12;
+    color = "#e7fc03";
+    name = "";
+
+    constructor(x_new, y_new, name_new)
+    {
+        this.x = x_new;
+        this.y = y_new;
+        this.name = name_new;
+    }
+
+    GetX(){
+        return this.x;
+    }
+
+    GetY(){
+        return this.y;
+    }
+
+    GetSize(){
+        return this.size;
+    }
+    
+    GetName(){
+        return this.name;
+    }
+
+    GetColor(){
+        return this.color;
+    }
+
+
+}
+
 class CircularItem
 {
     x = 0;
@@ -15,7 +53,7 @@ class CircularItem
     name = "";
     description = "";
 
-    CircularItem(new_position_x, new_position_y, new_size, new_color, new_name, new_description)
+    constructor(new_position_x, new_position_y, new_size, new_color, new_name, new_description)
     {
         this.x = new_position_x;
         this.y = new_position_y;
@@ -65,6 +103,313 @@ class CircularItem
         this.color = new_color;
     }
 
+
+    toString() {
+        const ret = 'CircularItem ' + this.name + ' x: ' + this.x + ' y: ' + this.y + ' size: ' + this.color + ' size: '+this.size;
+        return ret;
+      }
+      
+}
+
+
+class Sensor{
+
+    x = 0;
+    y = 0;
+    theta = 0;
+
+    size = 0;
+    size_flash = 0;
+    direction = 0;
+    name = "";
+
+    dx = 1;
+    dy = 1;
+
+    distances = {'sensor1':0,'sensor2':0,'sensor3':0,'sensor4':0,'sensor5':0,'sensor6':0,};
+
+    id_layer1   = ""; 
+
+    constructor(new_name, new_x, new_y, new_theta, new_size, new_distances, id_layer1_new)
+    {
+        this.name = new_name;
+        this.x = new_x;
+        this.y = new_y;
+        this.theta = new_theta;
+        this.size = new_size;
+
+        this.id_layer1   = id_layer1_new; 
+
+        if(new_distances['sensor1'] != null)
+        {
+            this.distances['sensor1'] = new_distances['sensor1'];
+        }
+
+        if(new_distances['sensor2'] != null)
+        {
+            this.distances['sensor2'] = new_distances['sensor2'];
+        }
+
+        if(new_distances['sensor3'] != null)
+        {
+            this.distances['sensor3'] = new_distances['sensor3'];
+        }
+
+        if(new_distances['sensor4'] != null)
+        {
+            this.distances['sensor4'] = new_distances['sensor4'];
+        }
+
+
+        if(new_distances['sensor5'] != null)
+        {
+            this.distances['sensor5'] = new_distances['sensor5'];
+        }
+
+        if(new_distances['sensor6'] != null)
+        {
+            this.distances['sensor6'] = new_distances['sensor6'];
+        }
+    }
+
+    Draw()
+    {
+        var canvas = document.getElementById(this.id_layer1);
+        if (canvas.getContext) 
+        {
+            var ctx = canvas.getContext('2d');
+            canvas.width = 1002+38.5;
+            canvas.height = 668+39.3;
+        
+
+            // Draw upper limit sensor
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                        
+            ctx.beginPath();
+            ctx.moveTo(25, 25);
+            ctx.lineTo(this.size, 25);
+            ctx.lineTo(25, this.size);
+            ctx.fill();
+
+            // Draw wave inside sensor
+            var gradient = ctx.createLinearGradient(0, 0, 0, this.size_flash);
+            gradient.addColorStop("0", 'rgba(0,0,0,0.25)');
+            gradient.addColorStop("0.5" ,'rgba(255,255,255,0.25)');
+            gradient.addColorStop("1.0", 'rgba(0,0,0,0.25)');
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 3;            
+            
+            ctx.beginPath();
+            ctx.moveTo(this.size_flash, 25);
+            ctx.lineTo(25, this.size_flash);
+            ctx.stroke();
+
+            
+            
+        }
+    }
+
+    Update()
+    {
+
+        var width = 100;
+        
+        // Get Distance Sensor
+        var distance_sensor1 = this.distances['sensor1'];
+        // Calculate step to Distance Sensor
+       console.log(distance_sensor1);
+        
+        if((this.size) >= distance_sensor1) 
+        {
+            this.size = this.size; // keep same size
+            this.size_flash += this.direction*this.dx;
+        }
+
+        if((this.size) < distance_sensor1) 
+        {
+            this.size += this.dx; // keep same size
+            this.size_flash += this.direction*this.dx;
+        }
+
+        if(this.size_flash >=this.size)
+        {
+            this.size_flash -=this.dx;
+            this.direction = -3;
+        }
+        if(this.size_flash <=35)
+        {
+            this.size_flash +=this.dx;
+            this.direction = 3;
+        }
+
+    }
+
+    Animate()
+    {
+        
+        this.Draw();
+        this.Update();
+        requestAnimationFrame(this.Animate.bind(this));
+    }
+
+
+}
+
+
+class RobotDrawing
+{
+    x = 0;
+    y = 0;
+    theta = 0;
+
+    size = 0;
+    size_flash = 0;
+    direction = 0;
+    name = "";
+
+    dx = 1;
+    dy = 1;
+
+    distances = {'sensor1':0,'sensor2':0,'sensor3':0,'sensor4':0,'sensor5':0,'sensor6':0,};
+
+    id_layer1   = ""; 
+
+    constructor(new_name, new_x, new_y, new_theta, new_size, new_distances, id_layer1_new)
+    {
+        this.name = new_name;
+        this.x = new_x;
+        this.y = new_y;
+        this.theta = new_theta;
+        this.size = new_size;
+
+        this.id_layer1   = id_layer1_new; 
+
+        if(new_distances['sensor1'] != null)
+        {
+            this.distances['sensor1'] = new_distances['sensor1'];
+        }
+
+        if(new_distances['sensor2'] != null)
+        {
+            this.distances['sensor2'] = new_distances['sensor2'];
+        }
+
+        if(new_distances['sensor3'] != null)
+        {
+            this.distances['sensor3'] = new_distances['sensor3'];
+        }
+
+        if(new_distances['sensor4'] != null)
+        {
+            this.distances['sensor4'] = new_distances['sensor4'];
+        }
+
+
+        if(new_distances['sensor5'] != null)
+        {
+            this.distances['sensor5'] = new_distances['sensor5'];
+        }
+
+        if(new_distances['sensor6'] != null)
+        {
+            this.distances['sensor6'] = new_distances['sensor6'];
+        }
+    }
+
+
+    Draw()
+    {
+        var canvas = document.getElementById(this.id_layer1);
+        if (canvas.getContext) 
+        {
+            var ctx = canvas.getContext('2d');
+            canvas.width = 1002+38.5;
+            canvas.height = 668+39.3;
+        
+
+            // Draw upper limit sensor
+            ctx.fillStyle = 'rgba(245, 171, 61, 0.87)';
+                        
+            ctx.beginPath();
+            ctx.translate((this.x)+50/2, (this.y)+88/2);
+            ctx.rotate(this.theta*Math.PI / 180);
+            ctx.translate(-((this.x)+50/2), -((this.y)+88/2));
+
+            ctx.moveTo((this.x+0), this.y+0);
+            ctx.lineTo(this.x+50, this.y+0);
+            
+            ctx.lineTo(this.x+50, this.y+10);
+            ctx.arc(this.x+50,this.y+22,12,1.5*Math.PI,0.5*Math.PI,true);
+            ctx.lineTo(this.x+50, this.y+54);
+            ctx.arc(this.x+50,this.y+66,12,1.5*Math.PI,0.5*Math.PI,true);
+            ctx.lineTo(this.x+50, this.y+88);
+            ctx.lineTo(this.x+0, this.y+88);
+            ctx.lineTo(this.x+0, this.y+78);
+            ctx.arc(this.x+0,this.y+66,12,0.5*Math.PI,1.5*Math.PI,true);
+            ctx.lineTo(this.x+0, this.y+40);
+            ctx.arc(this.x+0,this.y+22,12,0.5*Math.PI,1.5*Math.PI,true);
+            ctx.lineTo(this.x+0, this.y+0);
+
+            
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            
+           
+
+            
+          
+            
+        }
+    }
+
+    Update()
+    {
+
+        var width = 100;
+        
+        // Get Distance Sensor
+        var distance_sensor1 = this.distances['sensor1'];
+        // Calculate step to Distance Sensor
+       console.log(distance_sensor1);
+        
+        if((this.size) >= distance_sensor1) 
+        {
+            this.size = this.size; // keep same size
+            this.size_flash += this.direction*this.dx;
+        }
+
+        if((this.size) < distance_sensor1) 
+        {
+            this.size += this.dx; // keep same size
+            this.size_flash += this.direction*this.dx;
+        }
+
+        if(this.size_flash >=this.size)
+        {
+            this.size_flash -=this.dx;
+            this.direction = -3;
+        }
+        if(this.size_flash <=35)
+        {
+            this.size_flash +=this.dx;
+            this.direction = 3;
+        }
+
+    }
+
+    Animate()
+    {
+        
+        this.Draw();
+        this.Update();
+        //requestAnimationFrame(this.Animate.bind(this));
+    }
+
+
+
 }
 
 
@@ -73,9 +418,6 @@ class Map{
     // Attributes
     p_width  = 38.5;
     p_height = 39.3;
-
-    g_offset_x = p_width;
-    g_offset_y = p_height;
 
     bouee_green_color    = '#006f3d';
     bouee_red_color      = '#bb1e10';
@@ -89,9 +431,10 @@ class Map{
     id_layer_4  = "";
 
     list_circular_items = [];
+    list_robot_positions = [];
 
     // Constructor
-    Map(map_background_new, id_layer1_new, id_layer2_new, id_layer3_new, id_layer_4_new)
+    constructor(map_background_new, id_layer1_new, id_layer2_new, id_layer3_new, id_layer4_new)
     {
         this.map_background = map_background_new;
         this.id_layer1   = id_layer1_new; 
@@ -112,12 +455,16 @@ class Map{
         canvas.width = 1002+this.p_width;
         canvas.height = 668+this.p_height;
 
+        // Define 
+        var offset_x = 38.5;
+        var offset_y = 39.3;
+
         // Get background image
         var background = new Image();
         background.src = this.map_background;
 
         //Draw background
-        background.onload = function(){ctx.drawImage(background,p_width,p_height)};
+        background.onload = function(){ctx.drawImage(background,offset_x,offset_y)};
     }
 
     // Draw framing from 0 to 17 and A to Z
@@ -132,27 +479,27 @@ class Map{
 
         // Draw vertical lines
         for (var x = 0; x <= 26; x += 1) {
-            context.moveTo(x*p_width+p_width, p_width);
-            context.lineTo(x*p_width+p_width, bh + p_width);
+            context.moveTo(x*this.p_width+this.p_width, this.p_width);
+            context.lineTo(x*this.p_width+this.p_width, canvas.height + this.p_width);
         }
     
         // Draw horizontal lines
         for (var x = 0; x <= 17; x += 1) {
-            context.moveTo(p_height, x*p_height+p_height);
-            context.lineTo(bw + p_height,x*p_height+p_height);
+            context.moveTo(this.p_height, x*this.p_height+this.p_height);
+            context.lineTo(canvas.width  + this.p_height,x*this.p_height+this.p_height);
         }
         context.strokeStyle = "black";
     
         // Draw Letters
         for(var i=0;i < 26; i++)
         {
-            context.fillText(String.fromCharCode('A'.charCodeAt(0) + i), p_width*1.5+p_width*i, 30); 
+            context.fillText(String.fromCharCode('A'.charCodeAt(0) + i), this.p_width*1.5+this.p_width*i, 30); 
         }
     
         // Draw numbers
         for(var i=0;i < 17; i++)
         {
-            context.fillText(1+i, 20, p_height*1.5+i*p_height); 
+            context.fillText(1+i, 20, this.p_height*1.5+i*this.p_height); 
         }
     
         // Draw
@@ -173,215 +520,96 @@ class Map{
         {
             // draw the colored region
             ctx.beginPath();
-            ctx.arc(ConvertX(this.list_circular_items[i].GetX()), ConvertY(this.list_circular_items[i].GetY()), this.list_circular_items[i].GetSize(), 0, 2*Math.PI);
+            ctx.arc(this.ConvertX(this.list_circular_items[i].GetX()), this.ConvertY(this.list_circular_items[i].GetY()), this.list_circular_items[i].GetSize(), 0, 2*Math.PI);
             ctx.fillStyle = this.list_circular_items[i].GetColor();
             ctx.fill();
 
             // draw the stroke
             ctx.lineWidth = 0;
-            ctx.strokeStyle = '#FF0000';
+            ctx.strokeStyle = '#000000';
             ctx.stroke();
+
         }    
+
     }
 
     AddItem(name_item, x,y,size,description,color)
     {
-        this.list_circular_items.append(new CircularItem(x, y, size, color, name_item, description));
+        this.list_circular_items.push(new CircularItem(x, y, size, color, name_item, description));
     }
 
-
-}
-
-
-    // Padding
-    var p_width = 38.5;
-    var p_height = 39.3;
-
-
-    
-/**
- * Function to draw the background of the map
- */
-function DrawMap(background_image)
-{
-    var canvas = document.getElementById("canvas_layer1_index");
-    var ctx = canvas.getContext("2d");
-    
-    canvas.width = 1002+p_width;
-    canvas.height = 668+p_height;
-
-
-    var background = new Image();
-    background.src = background_image;
-
-    background.onload = function(){ctx.drawImage(background,p_width,p_height)};
-}
-
-
-function drawBoard(){
-
-    // Box width
-var bw = 1002+p_width;
-// Box height
-var bh = 668+p_height;
-
-
-var canvas = document.getElementById("canvas_layer3_index");
-var context = canvas.getContext("2d");
-canvas.width = bw;
-    canvas.height = bh;
-    for (var x = 0; x <= 26; x += 1) {
-        context.moveTo(x*p_width+p_width, p_width);
-        context.lineTo(x*p_width+p_width, bh + p_width);
-        
-    }
-
-    for (var x = 0; x <= 17; x += 1) {
-        context.moveTo(p_height, x*p_height+p_height);
-        context.lineTo(bw + p_height,x*p_height+p_height);
-    }
-    context.strokeStyle = "black";
-
-
-for(var i=0;i < 26; i++)
-{
-    context.fillText(String.fromCharCode('A'.charCodeAt(0) + i), p_width*1.5+p_width*i, 30); 
-}
-
-for(var i=0;i < 17; i++)
-{
-    context.fillText(1+i, 20, p_height*1.5+i*p_height); 
-}
-
-    context.stroke();
-}
-
-var g_offset_x = p_width;
-var g_offset_y = p_height;
-
-var bouee_green_color = '#006f3d';
-var bouee_red_color = '#bb1e10';
-var robot_position_color = '#e7fc03';
-
-function DrawInitialItems()
-{
-    var canvas = document.getElementById("canvas_layer2_index");
-    var ctx = canvas.getContext("2d");
-    canvas.width = 1002+p_width;;
-    canvas.height = 668+p_height;
-    // draw the colored region
-    ctx.beginPath();
-    ctx.arc(ConvertX(670), ConvertY(100), 18/2.0, 0, 2*Math.PI);
-    ctx.fillStyle = bouee_red_color;
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(ConvertX(1005), ConvertY(400), 18/2.0, 0, 2*Math.PI);
-    ctx.fillStyle = bouee_green_color;
-    ctx.fill();
-        
-
-    ctx.beginPath();
-    ctx.arc(ConvertX(1100), ConvertY(800), 18/2.0, 0, 2*Math.PI);
-    ctx.fillStyle = bouee_red_color;
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(ConvertX(1730), ConvertY(1200), 18/2.0, 0, 2*Math.PI);
-    ctx.fillStyle = bouee_red_color;
-    ctx.fill();
-
-
-    // draw the stroke
-    ctx.lineWidth = 0;
-    ctx.strokeStyle = '#FF0000';
-    ctx.stroke();
-}
-
-function DrawRobotPosition(x,y)
-{
-    var canvas = document.getElementById("canvas_layer4_index");
-    var ctx = canvas.getContext("2d");
-    
-    canvas.width = 1002+p_width;;
-    canvas.height = 668+p_height;
-
-    var old_x = -1;
-    var old_y = -1;
-
-    var j = 0;
-
-    var list_points = [{x,y}];
-
-    //gets table
-    var oTable = document.getElementById('body_chronology');
-
-    //gets rows of table
-    var rowLength = oTable.rows.length;
-    console.log(rowLength);    
-
-    var nb_points = 0;
-    //loops through rows    
-    for (i = (rowLength-1); i >= 0 ; i--)
+    ConvertX(x)
     {
-        //gets cells of current row
-        var oCells = oTable.rows.item(i).cells;
- 
-        //gets amount of cells of current row
-        var cellLength = oCells.length;
- 
-        var position = oCells.item(2).innerHTML;
-        
-        var str = position;
-        var patt = /(\d+)/g;
-        var result = str.match(patt);
-        console.log(result[0]+" "+result[1]+" "+result[2]);
-
-        // draw the colored region
-        ctx.beginPath();
-
-        ctx.arc(ConvertX(result[0]), ConvertY(result[1]), 10/2.0, 0, 2*Math.PI);
-        ctx.fillStyle = robot_position_color;
-        ctx.fill();
-
-        if((old_x != -1) && (old_y != -1))
-        {
-            // if there is already a former point which can be connected to the new point
-            ctx.lineTo(ConvertX(old_x), ConvertY(old_y));
-            console.log("i:"+i + "old_x: "+old_x+" old_y: "+old_y);
-        }
-
-        old_x = result[0];
-        old_y = result[1];
-
-        list_points[j] = {x:result[0], y:result[1]};
-
-        j++;
-
+        return (this.p_width + x*1002/3000);
     }
 
-    console.log("j: "+j);
-
-    for(k=0;k<j;k++)
+    ConvertY(y)
     {
-        ctx.beginPath();
+        return (this.p_height + y*668/2000);
+    }
 
-        if(k == 0)
+    AddRobotItem(name_robot, x,y)
+    {
+        this.list_robot_positions.push(new RobotItem(x, y, name_robot));
+    }
+
+    DrawRobotPositions()
+    {
+        var canvas = document.getElementById(this.id_layer_4);
+        var ctx = canvas.getContext("2d");
+        
+        canvas.width = 1002+this.p_width;;
+        canvas.height = 668+this.p_height;
+
+        var old_x = -1;
+        var old_y = -1;
+
+        var j = 0;
+
+
+        var nb_points = 0;
+
+        //loops through rows    
+        for (var i=0;i<this.list_robot_positions.length;i++)
         {
-            ctx.moveTo(ConvertX(list_points[k].x), ConvertX(list_points[k].y));
-        }
-        else{
-
-            ctx.moveTo(ConvertX(list_points[k-1].x), ConvertX(list_points[k-1].y));
             
+            ctx.beginPath();
+
+            ctx.arc(this.ConvertX(this.list_robot_positions[i].GetX()), this.ConvertY(this.list_robot_positions[i].GetY()), this.list_robot_positions[i].GetSize(), 0, 2*Math.PI);
+            ctx.fillStyle = this.list_robot_positions[i].GetColor();
+            ctx.globalAlpha = (i*0.75/this.list_robot_positions.length) + 0.25;
+            ctx.fill();
+
+            if((old_x != -1) && (old_y != -1))
+            {
+                // if there is already a former point which can be connected to the new point
+                ctx.lineTo(this.ConvertX(old_x), this.ConvertY(old_y));
+            }
+
+            old_x = this.list_robot_positions[i].GetX();
+            old_y = this.list_robot_positions[i].GetY();
+
         }
 
-        ctx.lineTo(ConvertX(list_points[k].x), ConvertY(list_points[k].y ));
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.stroke();
+        for(var i=0;i<this.list_robot_positions.length;i++)
+        {
+            ctx.beginPath();
 
-    }
+            if(i == 0)
+            {
+                ctx.moveTo(this.ConvertX(this.list_robot_positions[i].GetX()), this.ConvertY(this.list_robot_positions[i].GetY()));
+            }
+            else{
+
+                ctx.moveTo(this.ConvertX(this.list_robot_positions[i-1].GetX()), this.ConvertY(this.list_robot_positions[i-1].GetY()));                
+            }
+
+            ctx.lineTo(this.ConvertX(this.list_robot_positions[i].GetX()), this.ConvertY(this.list_robot_positions[i].GetY()));
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.stroke();
+
+        }
 
     // draw the stroke
     ctx.lineWidth = 0;
@@ -389,17 +617,10 @@ function DrawRobotPosition(x,y)
     ctx.stroke();
     ctx.closePath();
    
+    }
+
 }
 
-function ConvertX(x)
-{
-    return (g_offset_x + x*1002/3000);
-}
-
-function ConvertY(y)
-{
-    return (g_offset_y + y*668/2000);
-}
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
