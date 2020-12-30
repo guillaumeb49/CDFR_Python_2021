@@ -1,5 +1,5 @@
 /**
- * @brief Manage the WebSocket interface which exchanges data between local WebServer and Qt
+ * @brief Manage the WebSocket interface which exchanges data between local WebServer
  * 
  * 
  * @author Guillaume B.
@@ -9,7 +9,10 @@
 
 var socketio = null;
 
-
+/**
+ * @brief Generate a debug message with timestamp
+ * @param {*} message 
+ */
 function debug(message) {
     var dt = new Date();
     var time = dt.getDate() +"/"+(dt.getMonth()+1)+"/"+dt.getFullYear()+" - " +dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
@@ -64,11 +67,66 @@ function initWebSocket() {
             old_x = data["x"];
             old_y = data["y"];
             console.log(data);
-          });
+        });
+
+
+        socketio.on('AllRobotRegistered', (data) => {
+            
+
+            if($( "#table_registered" ).length)
+            {
+                console.log("AllRobotRegistered");
+                $("#table_registered>tbody").prepend("<tr>\
+                <td data-label='UID'>"+data["uid"]+"</td>\
+                <td data-label='Name'>"+data["name"]+"</td>\
+                <td data-label='Registration'>0000</td>\
+                <td data-label='Last Connexion'>0000</td>\
+                <td data-label='IP'>0000000</td>\
+              </tr>");
+            }
+            
+            
+        });
+
+        socketio.on('authentification', (data) => {
+              console.log("I am inside authentification !!!!");
+            if(data["robotname"])
+            {
+                console.log("je devrais lancer un uiALert ");
+                $.suiAlert({
+                    title: 'Robot Connected',
+                    description: data["robotname"]+' is now connected',
+                    type: 'info',
+                    time: '3',
+                    position: 'top-right',
+                });
+
+               
+    $("#guillaume_robot_connexion_status").removeClass("check green red close").removeClass("outline");
+    $("#guillaume_robot_connexion_status").addClass("check green ").removeClass("outline");
+            }
+              });
 
       });
+
+
+     
     
 }
+
+
+function AddRobotRegistered(name, uid)
+{
+    console.log("AddRobotRegistered( "+name+", "+uid+")");
+    socketio.emit('AddRobotRegistered', {'name': name, 'uid':uid});
+}
+
+function GetAllRobotRegistered()
+{
+    console.log("GetAllRobotRegistered");
+    socketio.emit('GetAllRobotRegistered', {});
+}
+
 
 function stopWebSocket() {
     if (socketio)
@@ -103,4 +161,5 @@ function checkSocket() {
     }
     return stateStr;
 }
+
 

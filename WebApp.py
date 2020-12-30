@@ -95,6 +95,27 @@ class RobotStatusDBB(db.Model):
    def __repr__(self):
       return '<User %r>' % self.username
 
+class RobotRegistered(db.Model):
+   id    = db.Column(db.Integer, primary_key=True)
+   uid   = db.Column(db.String(96), nullable=False)
+   name  = db.Column(db.String(30), nullable=False)
+   timestamp_registration  = db.Column(db.DateTime(),nullable=False)
+   timestamp_lastconnexion = db.Column(db.DateTime(),nullable=False)
+   last_ip = db.Column(db.String(15), nullable=False)
+
+   def __init__(self, new_uid, new_name, new_registration, new_connexion, new_ip):
+      self.uid = new_uid
+      self.name =  new_name
+      self.timestamp_registration = new_registration
+      self.timestamp_lastconnexion = new_connexion
+      self.last_ip = new_ip
+
+   def __repr__(self):
+      return '<RobotRegistered %r>' % self.uid
+
+   def as_dict(self):
+       return {c.name: unicode(getattr(self, c.name)) for c in self.__table__.columns}
+
 @app.route("/")
 def index():
    now = datetime.now()
@@ -110,7 +131,12 @@ def messageReceived(methods=['GET', 'POST']):
 
 @socketio.on('connect')
 def test_connect():
-   print('Client connected')
+   
+   print('Client connected sid:'+str(request.sid))
+
+@socketio.on('disconnect')
+def test_connect():
+   print('Client disconnected sid: '+str(request.sid))
    
 
 @socketio.on('my event')
@@ -120,7 +146,25 @@ def handle_my_custom_event(msg, methods=['GET', 'POST']):
    #print("distance :"+str(robot.distances))
    #msg = json.loads(msg)
    socketio.emit('my response', {"cmd":"getInfo","data":0, "current_position":0, "leds":0, "distances":0})
-   
+
+@socketio.on('authentification')
+def authentification(msg):
+   print("received authentification request"+str(msg))
+   socketio.emit('authentification', {'robotname':msg['robotname']})
+
+@socketio.on('AddRobotRegistered')
+def AddRobotRegistered(data):
+   if data['uid'] and data['name']:
+      timestamp = datetime.now()
+      robotregistered = RobotRegistered(data['uid'], data['name'], timestamp, timestamp, "000.000.000.000")
+      db.session.add(robotregistered)
+      db.session.commit()  
+
+@socketio.on('GetAllRobotRegistered')
+def GetAllRobotRegistered(data):
+   allrobots = RobotRegistered.query.all()
+   socketio.emit('AllRobotRegistered', allrobots)
+ 
 
 @app.route('/map/')
 def map():
@@ -174,9 +218,11 @@ def video_feed():
    if raspberry == 1:
       return Response(gen(VisionCamera()),mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
+@app.route('/myrobots/')
+def myrobots():
+    return render_template('myrobots.html')
 
 
 if __name__ == "__main__":
    db.create_all()
-   socketio.run(app, host='0.0.0.0',port=80, debug=True)
+   socketio.run(app, host='0.0.0.0',port=666, debug=True)

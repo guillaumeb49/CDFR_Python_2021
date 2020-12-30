@@ -5,9 +5,11 @@
   <meta charset="utf-8">
 
   <title>C-Bot Robot 1</title>
-  <meta name="description" content="The HTML5 Herald">
-  <meta name="author" content="SitePoint">
+  <meta name="description" content="CBOT² - French Robotics Cup">
+  <meta name="author" content="CBOT²">
 
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic/dist/semantic.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo_cbot.png') }}" />
@@ -21,13 +23,10 @@
   crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='semantic/dist/semantic.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js" integrity="sha512-AcZyhRP/tbAEsXCCGlziPun5iFvcSUpEz2jKkx0blkYKbxU81F+iq8FURwPn1sYFeksJ+sDDrI5XujsqSobWdQ==" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='tools/alert_ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
 
 <script src="{{ url_for('static', filename='js/Robot_Class.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ux_index.js') }}"></script>
-<script src="{{ url_for('static', filename='tools/WebSocket.js') }}"></script>
-<script src="{{ url_for('static', filename='tools/maps.js') }}"></script>
-<script src="{{ url_for('static', filename='js/Robot_Drawing.js') }}"></script>
-<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
 
 </head>
 
@@ -43,7 +42,8 @@
           <a {% if request.url_rule.endpoint == "index" %} class="item active"{% endif %} href="/" class="item">Game!</a>
           <a {% if request.url_rule.endpoint == "map" %} class="item active"{% endif %} href="/map/" class="item">Map</a>
           <a {% if request.url_rule.endpoint == "tests" %} class="item active"{% endif %} href="/tests/" class="item">Tests</a>
-          <a {% if request.url_rule.endpoint == "video_feed" %} class="item active"{% endif %} href="/video_feed/" class="item">Vision</a>
+          <!--<a {% if request.url_rule.endpoint == "video_feed" %} class="item active"{% endif %} href="/video_feed/" class="item">Vision</a>-->
+          <a {% if request.url_rule.endpoint == "myrobots" %} class="item active"{% endif %} href="/myrobots/" class="item">My Robots</a>
         </div>
 
 
@@ -109,25 +109,34 @@
   If index page -> Draw the Map 
 -->
 {% if request.url_rule.endpoint == "index" %}
-  <script type="text/javascript">
-    DrawMap("../static/img/TableCDFR2020.png");
-    DrawInitialItems();
-    drawBoard();
-    MapEventManager()
-  </script>
+  <script src="{{ url_for('static', filename='js/ux_index.js') }}"></script>
 {% endif %}
+
+{% if request.url_rule.endpoint == "map" %}
+  <script src="{{ url_for('static', filename='js/Robot_Drawing.js') }}"></script>
+  <script src="{{ url_for('static', filename='tools/maps.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ux_map.js') }}"></script>
+{% endif %}
+
 
 {% if request.url_rule.endpoint == "tests" %}
   <script src="{{ url_for('static', filename='js/ux_tests.js') }}"></script>
 {% endif %}
+
+{% if request.url_rule.endpoint == "myrobots" %}
+  <script src="{{ url_for('static', filename='js/ux_myrobots.js') }}"></script>
+{% endif %}
+
 <!-- Always run these functions-->
+
+<script src="{{ url_for('static', filename='js/ux_base.js') }}"></script>
+<script src="{{ url_for('static', filename='tools/WebSocket.js') }}"></script>
+
 <script type="text/javascript">
 
   // initialize the websockets
   initWebSocket();
-
-  // if click on menu status check connection with Server
-  $("#menu_connection_status").on("click", function(){checkSocketUI();});
+  
 </script>
 
 </html>

@@ -6,12 +6,13 @@
  */
 
 class Robot{
+  uid                     = 0;
   current_position        = {'x':0,'y':0,'theta':0};
   vecteurDeplacement      = {'x':0,'y':0,'theta':0};
   next_position           = {'x':0,'y':0,'theta':0};
   asservissement_status   = 0;
   ready_to_start          = 0;
-  distances               = [0,0,0,0];
+  distances               = [0,0,0,0,0,0];
   tirette_status          = 0;
   leds                    = [0,0,0,0,0,0,0,0];
   servos_position         = [0,0,0,0,0,0];
@@ -34,30 +35,6 @@ class Robot{
     this.distances = new_distances;
   }
 
-  MoveFoward()
-  {
-    sendMessage("forward");
-  }
-
-  MoveBackward()
-  {
-    sendMessage("backward");
-  }
-
-  MoveLeft()
-  {
-    sendMessage("left");
-  }
-
-  MoveRight()
-  {
-    sendMessage("right");
-  }
-
-  MoveStop()
-  {
-    sendMessage("stop");
-  }
 
   getDistances()
   {

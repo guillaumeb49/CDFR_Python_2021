@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ui fluid right aligned container">
+  <div class="ui small basic icon buttons">
+    <button id="add_new_robot" class="ui button"><i class="add green icon"></i></button>
+    <button class="ui button"><i class="remove red icon"></i></button>
+    <button id="lookfor_registered_robot" class="ui button"><i class="zoom-in icon"></i></button>
+    <button class="ui button"><i class="download blue icon"></i></button>
+  </div>
+</div>
+
+  
+
+<h1 style="margin-top:20px" class="ui header centered">My Robots</h1>
+    <br/>
+    <div class="ui column centered grid">
+
+      <div class="ui link cards">
+        <div class="card">
+          <div class="image">
+            <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
+          </div>
+          <div class="content">
+            <div class="header">Mario</div>
+            <div class="description">
+              
+            </div>
+          </div>
+          <div class="extra content">
+            <span>
+              <i class="close red icon"></i>
+              Not-connected
+            </span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="image">
+            <img src="{{ url_for('static', filename='img/guillaume_robot.png') }}">
+          </div>
+          <div class="content">
+            <div class="header">Guillaume</div>
+            <div class="description">
+              
+            </div>
+          </div>
+          <div class="extra content">
+           
+            <span>
+              <i id="guillaume_robot_connexion_status" class="red close icon"></i>
+              Connected
+            </span>
+          </div>
+        </div>
+      </div>
+                
+   
+    </div>
+
+
+    <div class="ui hidden divider"></div>
+   
+
+    <!--<div style="margin:auto;margin-top:25px; text-align: center">
+      <img src="{{ url_for('video_feed') }}">
+    </div>-->
+    
+    <div id="add_new_robot_modal" class="ui modal">
+      <i class="close icon"></i>
+      <div class="header">
+        Add a new Robot
+      </div>
+      <div class="image content">
+        <div class="ui small image">
+          <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
+        </div>
+        <div class="description">
+          <div class="ui header">Insert UID of STM32</div>
+          <p>Each STM32 has its own unique identifier (UID). <br/>
+            Please fill in your UID in the field bellow to register your robot on the platform.<br/>
+          You can also choose a name for your robot</p>
+          
+          <div class="ui fluid left action input">
+            <button class="ui yellow icon button">
+              <i class="microchip icon"></i>
+            </button>
+            <input id="uid_new_robot" type="text" value="" placeholder="UID">
+          </div>
+
+          <div style="margin-top:5px;"  class="ui fluid left action input">
+            <button  class="ui yellow icon button">
+              <i class="user outline icon"></i>
+              
+            </button>
+            <input id="name_new_robot" type="text" value="" placeholder="Name">
+            
+          </div>
+
+        </div>
+
+        
+      </div>
+      <div class="actions">
+        <div class="ui red deny button">
+          Cancel
+        </div>
+        <div class="ui positive right labeled icon button">
+          Verify & Add
+          <i class="add icon"></i>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="get_all_robot_modal" class="ui modal">
+      <i class="close icon"></i>
+      <div class="header">
+        Look for registered Robots
+      </div>
+      <div class="image content">
+        <div class="ui small image">
+          <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
+        </div>
+        <div class="description">
+          <div class="ui header">Look for all registered robots</div>
+          
+            <table id="table_registered robots" class="ui celled table">
+                <thead>
+                  <tr><th>Name</th>
+                  <th>UID</th>
+                  <th>Registration</th>
+                  <th>Last Connexion</th>
+                  <th>IP</th>
+                </tr></thead>
+                <tbody id="body_registered_robots">
+                  
+                </tbody>
+              </table>
+        
+
+        </div>
+
+        
+      </div>
+      <div class="actions">
+        <div class="ui red deny button">
+          Close
+        </div>
+      </div>
+    </div>
+
+    
+    
+
+{% endblock %}
+
+
+
