@@ -3,6 +3,8 @@
 # pip3 install flask
 # pip3 install flask_socketio
 # pip3 install numpy
+# pip3 install SQLAlchemy-serializer
+
 
 import eventlet
 eventlet.monkey_patch()
@@ -11,7 +13,7 @@ eventlet.monkey_patch()
 from flask import Flask, render_template, Response, jsonify, request, abort
 from flask_socketio import SocketIO, emit
 from flask import current_app 
-from datetime import datetime
+import datetime
 from queue import Queue
 import threading
 import socket
@@ -19,6 +21,8 @@ from time import sleep
 import json
 import pickle
 from flask import g
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy import desc
 
 #Database
 from flask_sqlalchemy import SQLAlchemy
@@ -59,13 +63,21 @@ db = SQLAlchemy(app)
 
 socketio = SocketIO(app)
 
+def converter(obj):
+
+    if isinstance(obj, (datetime.datetime, datetime.date)):
+
+        return obj.isoformat()
+
+    raise TypeError (f"{type(obj)} not datetime")
+
 
 def myconverter(o):
     if isinstance(o, datetime):
         return o.__str__()
 
 
-class RobotStatusDBB(db.Model):
+class RobotStatusDBB(db.Model, SerializerMixin):
    id = db.Column(db.Integer, primary_key=True)
    timestamp = db.Column(db.DateTime(),nullable=False)
    robotid = db.Column(db.String(30), nullable=False)
@@ -95,7 +107,7 @@ class RobotStatusDBB(db.Model):
    def __repr__(self):
       return '<User %r>' % self.username
 
-class RobotRegistered(db.Model):
+class RobotRegistered(db.Model, SerializerMixin):
    id    = db.Column(db.Integer, primary_key=True)
    uid   = db.Column(db.String(96), nullable=False)
    name  = db.Column(db.String(30), nullable=False)
@@ -111,14 +123,42 @@ class RobotRegistered(db.Model):
       self.last_ip = new_ip
 
    def __repr__(self):
-      return '<RobotRegistered %r>' % self.uid
+      return {c.name: getattr(getattr(self, c.name)) for c in self.__table__.columns}
 
-   def as_dict(self):
-       return {c.name: unicode(getattr(self, c.name)) for c in self.__table__.columns}
+   def to_dict(self):
+      return ({c.name: getattr(self, c.name)for c in self.__table__.columns})
+
+   def __str__(self):
+      return json.dumps({c.name: getattr(self, c.name)for c in self.__table__.columns}, default=converter)
+
+class Logs(db.Model, SerializerMixin):
+   id    = db.Column(db.Integer, primary_key=True)
+   uid   = db.Column(db.String(96), nullable=True)
+   timestamp   = db.Column(db.DateTime(),nullable=False)
+   event_type  = db.Column(db.String(30), nullable=False)
+   comments  = db.Column(db.String(255), nullable=False)
+   by = db.Column(db.String(30), nullable=False)
+
+   def __init__(self, new_uid, new_timestamp, new_event_type, new_comments, new_by):
+      self.uid = new_uid
+      self.timestamp =  new_timestamp
+      self.event_type = new_event_type
+      self.comments = new_comments
+      self.by = new_by
+
+   def __repr__(self):
+      return {c.name: getattr(getattr(self, c.name)) for c in self.__table__.columns}
+
+   def to_dict(self):
+      return ({c.name: getattr(self, c.name)for c in self.__table__.columns})
+
+   def __str__(self):
+      return json.dumps({c.name: getattr(self, c.name)for c in self.__table__.columns}, default=converter)
+
 
 @app.route("/")
 def index():
-   now = datetime.now()
+   now = datetime.datetime.now()
    timeString = now.strftime("%Y-%m-%d %H:%M")
    templateData = {
       'title' : 'HELLO!',
@@ -131,8 +171,9 @@ def messageReceived(methods=['GET', 'POST']):
 
 @socketio.on('connect')
 def test_connect():
-   
    print('Client connected sid:'+str(request.sid))
+   db.session.add(Logs(str(request.sid), datetime.datetime.now(),"connection", "Client connected on SocketIO", request.remote_addr))
+   db.session.commit()
 
 @socketio.on('disconnect')
 def test_connect():
@@ -155,7 +196,7 @@ def authentification(msg):
 @socketio.on('AddRobotRegistered')
 def AddRobotRegistered(data):
    if data['uid'] and data['name']:
-      timestamp = datetime.now()
+      timestamp = datetime.datetime.now()
       robotregistered = RobotRegistered(data['uid'], data['name'], timestamp, timestamp, "000.000.000.000")
       db.session.add(robotregistered)
       db.session.commit()  
@@ -163,12 +204,30 @@ def AddRobotRegistered(data):
 @socketio.on('GetAllRobotRegistered')
 def GetAllRobotRegistered(data):
    allrobots = RobotRegistered.query.all()
-   socketio.emit('AllRobotRegistered', allrobots)
+   list = []
+   for item in allrobots:
+      list.append(item.to_dict().copy())
+      print(list)
+   
+   socketio.emit('AllRobotRegistered', json.dumps(list,default=converter))
+
+@socketio.on('GetAllLogs')
+def GetAllLogs(data):
+   logs = Logs.query.order_by(desc(Logs.timestamp)).limit(100).all()
+   list = []
+   for item in logs:
+      list.append(item.to_dict().copy())
+   
+   socketio.emit('AllLogs', json.dumps(list,default=converter))
  
 
 @app.route('/map/')
 def map():
    return render_template('map.html')
+
+@app.route('/admin/')
+def admin():
+   return render_template('admin.html')
 
 @app.route('/api/task', methods=['GET'])
 def get_tasks():

@@ -2,10 +2,12 @@
 {% block content %}
 <div class="ui fluid right aligned container">
   <div class="ui small basic icon buttons">
-    <button id="add_new_robot" class="ui button"><i class="add green icon"></i></button>
-    <button class="ui button"><i class="remove red icon"></i></button>
-    <button id="lookfor_registered_robot" class="ui button"><i class="zoom-in icon"></i></button>
-    <button class="ui button"><i class="download blue icon"></i></button>
+    <button id="add_new_robot" class="ui big button"><i class="add big green icon"></i></button>
+    <button class="ui big button"><i class="pencil alternate big orange icon"></i></button>
+    <button class="ui big button"><i class="remove big red icon"></i></button>
+    <button id="lookfor_registered_robot" class="ui big button"><i class="zoom-in big icon"></i></button>
+    <button class="ui big button"><i class="download big blue icon"></i></button>
+    
   </div>
 </div>
 
@@ -16,7 +18,7 @@
     <div class="ui column centered grid">
 
       <div class="ui link cards">
-        <div class="card">
+        <div id="robot2" class="card">
           <div class="image">
             <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
           </div>
@@ -33,7 +35,7 @@
             </span>
           </div>
         </div>
-        <div class="card">
+        <div id="robot1" class="card">
           <div class="image">
             <img src="{{ url_for('static', filename='img/guillaume_robot.png') }}">
           </div>
@@ -59,7 +61,166 @@
 
     <div class="ui hidden divider"></div>
    
+    <div class="focus_robot" style="border-top:1px solid rgba(0, 0, 0, 0.2);border-left:1px solid rgba(0, 0, 0, 0.2);width:50px;height:50px; transform: translate(200px, 75px) rotate(45deg);background-color:#f2f2f2">
+    </div>
+    <div class="focus_robot" style="margin-top:50px;padding-top:50px;padding-bottom: 50px;border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 10px;background-color:#f2f2f2"  class="ui column centered grid">
+      
+      
 
+      <div class="ui centered cards">
+
+        
+        
+          <div class="card">
+            <div class="content">
+              <i class="right floated mini ui big map marker alternate icon"></i>
+              <div class="header">
+                Position
+              </div>
+              <div class="meta">
+                Position of the Robot
+              </div>
+              <div class="description">
+                x: <span id="test_pos_x">0</span><br/>
+                y: <span id="test_pos_y">0</span><br/>
+                theta: <span id="test_pos_theta">0</span>°<br/>
+              </div>
+            </div>
+            <div class="extra content">
+             
+            </div>
+          </div>
+
+
+          <div class="card">
+              <div class="content">
+                <i class="right floated mini ui big microchip icon"></i>
+                <div class="header">
+                  Distance sensors
+                </div>
+                <div class="meta">
+                  Value of VL53l01X
+                </div>
+                <div class="description">
+                  Sensor 1: <b><span id="distance_cm_sensor1">0</span></b> cm<br/>
+                  Sensor 2: <b><span id="distance_cm_sensor2">0</span></b> cm<br/>
+                  Sensor 3: <b><span id="distance_cm_sensor3">0</span></b> cm<br/>
+                  Sensor 4: <b><span id="distance_cm_sensor4">0</span></b> cm<br/>
+                </div>
+              </div>
+              <div class="extra content">
+                
+                
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="content">
+                  <i class="right floated mini ui big cogs icon"></i>
+                <div class="header">
+                  ServoMotors
+                </div>
+                <div class="meta">
+                  ServoMotors position
+                </div>
+                <div class="description">
+                  Servo 1: <b><span id="servo_1">0</span></b> °<br/>
+                  Servo 2: <b><span id="servo_2">0</span></b> °<br/>
+                  Servo 3: <b><span id="servo_3">0</span></b> °<br/>
+                  Servo 4: <b><span id="servo_4">0</span></b> °<br/>
+                </div>
+              </div>
+              <div class="extra content">
+                
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="content">
+                  <i class="right floated mini ui big lightbulb outline icon"></i>
+                <div class="header">
+                  LED
+                </div>
+                <div class="meta">
+                  LED STM32                    
+                </div>
+                <div class="description">
+                  LED 1: <b><span ><i id="LED_1" class="outline lightbulb icon"></i></span></b><br/>
+                  LED 2: <b><span ><i id="LED_2" class="outline lightbulb icon"></i></span></b><br/>
+                  LED 3: <b><span ><i id="LED_3" class="outline lightbulb icon"></i></span></b><br/>
+                  <hr>
+                  LED 4: <b><span id="LED_4"><i class="blue lightbulb icon"></i></span></b><br/>
+                  LED 5: <b><span id="LED_5"><i class="blue lightbulb icon"></i></span></b><br/>
+                  LED 6: <b><span id="LED_6"><i class="blue lightbulb icon"></i></span></b><br/>
+                  LED 7: <b><span id="LED_7"><i class="blue lightbulb icon"></i></span></b><br/>
+                  LED 8: <b><span id="LED_8"><i class="blue lightbulb icon"></i></span></b><br/>
+                  
+                </div>
+              </div>
+              <div class="extra content">
+               
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="content">
+                  <i class="right floated mini ui big square outline icon"></i>
+                <div class="header">
+                  Inputs
+                </div>
+                <div class="meta">
+                  Sensors & Buttons                    
+                </div>
+                <div class="description">
+                  Tirette: <b><span id="tirette"><i  class="large toggle on icon"></i></span></b><br/>
+                  <hr>
+                  IO/A 1: <b><span id="IOA_1"><i  class="large toggle on icon"></i></span></b><br/>
+                  IO/A 2: <b><span id="IOA_2"><i  class="large toggle on icon"></i></span></b><br/>
+                  IO/A 3: <b><span id="IOA_3"><i  class="large toggle off icon"></i></span></b><br/>
+                  
+                  <hr>
+                  IO/B 1: <b><span id="IOB_1"><i  class="large toggle off icon"></i></span></b><br/>
+                  IO/B 2: <b><span id="IOB_2"><i  class="large toggle off icon"></i></span></b><br/>
+                  IO/B 3: <b><span id="IOB_3"><i  class="large toggle off icon"></i></span></b><br/>
+                  
+                  
+                </div>
+              </div>
+              <div class="extra content">
+                
+              </div>
+            </div>
+
+        </div>
+
+        <div class="ui fluid container">
+          <div class="ui column centered grid" style="margin-top:75px"><h3>Manual Controls</h3><br/></div>
+          <div class="ui column centered grid" style="margin-top:30px">
+            <div style="width: 300px">
+              <button id="robot_up" class="ui huge icon button" style="margin-bottom:15px">
+                <i class="arrow up icon"></i>
+              </button>
+            <div> 
+            
+            <button id="robot_left" class="ui huge icon button"><i class="arrow left icon"></i></button>
+            
+            <span style="margin-right:40px;margin-left:40px;min-width:75px"></span>
+            
+            <button id="robot_right" class=" ui huge icon button"><i class="arrow right icon"></i></button>
+          
+            </div>
+              <button id="robot_down" class="ui huge icon button" style="margin-top:15px"><i class="arrow down icon"></i></button>
+          </div> 
+        </div>
+
+    </div>
+ 
+  </div>
+
+  <div class="ui hidden divider"></div>
+    
+
+ 
     <!--<div style="margin:auto;margin-top:25px; text-align: center">
       <img src="{{ url_for('video_feed') }}">
     </div>-->
@@ -120,10 +281,48 @@
         <div class="ui small image">
           <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
         </div>
-        <div class="description">
+        <div class="ui description">
           <div class="ui header">Look for all registered robots</div>
           
-            <table id="table_registered robots" class="ui celled table">
+            <div class="ui scrolling content"> 
+              <table id="table_registered" class="ui celled table ">
+                <thead>
+                  <tr><th>UID</th>
+                  <th>Name</th>
+                  <th>Registration</th>
+                  <th>Last Connexion</th>
+                  <th>IP</th>
+                </tr></thead>
+                <tbody id="body_registered_robots">
+                  
+                </tbody>
+              </table>
+            </div>
+        </div>
+
+        
+      </div>
+      <div class="actions">
+        <div class="ui red deny button">
+          Close
+        </div>
+      </div>
+    </div>
+
+    <div id="get_all_robot_modal" class="ui modal">
+      <i class="close icon"></i>
+      <div class="header">
+        Look for registered Robots
+      </div>
+      <div class="image content">
+        <div class="ui small image">
+          <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
+        </div>
+        <div class="ui description">
+          <div class="ui header">Look for all registered robots</div>
+          
+            <div class="ui scrolling content"> 
+              <table id="table_registered" class="ui celled table ">
                 <thead>
                   <tr><th>Name</th>
                   <th>UID</th>
@@ -135,8 +334,7 @@
                   
                 </tbody>
               </table>
-        
-
+            </div>
         </div>
 
         

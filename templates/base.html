@@ -41,9 +41,9 @@
           </a>
           <a {% if request.url_rule.endpoint == "index" %} class="item active"{% endif %} href="/" class="item">Game!</a>
           <a {% if request.url_rule.endpoint == "map" %} class="item active"{% endif %} href="/map/" class="item">Map</a>
-          <a {% if request.url_rule.endpoint == "tests" %} class="item active"{% endif %} href="/tests/" class="item">Tests</a>
           <!--<a {% if request.url_rule.endpoint == "video_feed" %} class="item active"{% endif %} href="/video_feed/" class="item">Vision</a>-->
           <a {% if request.url_rule.endpoint == "myrobots" %} class="item active"{% endif %} href="/myrobots/" class="item">My Robots</a>
+          <a {% if request.url_rule.endpoint == "admin" %} class="item active"{% endif %} href="/admin/" class="item">Admin</a>
         </div>
 
 
@@ -125,6 +125,10 @@
 
 {% if request.url_rule.endpoint == "myrobots" %}
   <script src="{{ url_for('static', filename='js/ux_myrobots.js') }}"></script>
+{% endif %}
+
+{% if request.url_rule.endpoint == "admin" %}
+  <script src="{{ url_for('static', filename='js/ux_admin.js') }}"></script>
 {% endif %}
 
 <!-- Always run these functions-->

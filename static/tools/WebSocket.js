@@ -72,20 +72,30 @@ function initWebSocket() {
 
         socketio.on('AllRobotRegistered', (data) => {
             
+            var msg = JSON.parse(data)
+            console.log("AllRobotRegistered "+msg[0]["uid"]);
+            $("#table_registered>tbody tr").remove(); 
+for(var i = 0;i<msg.length;i++)
+{
+    msg[i]["timestamp_registration"] = new Date(msg[i]["timestamp_registration"]);
+    msg[i]["timestamp_lastconnexion"] = new Date(msg[i]["timestamp_lastconnexion"]);
+    $("#table_registered>tbody").append("<tr>\
+    <td data-label='UID'>"+msg[i]["uid"]+"</td>\
+    <td data-label='Name'>"+msg[i]["name"]+"</td>\
+    <td data-label='Registration'>"+msg[i]["timestamp_registration"].toLocaleString("fr-FR")+"</td>\
+    <td data-label='Last Connexion'>"+msg[i]["timestamp_lastconnexion"].toLocaleString("fr-FR")+"</td>\
+    <td data-label='IP'>"+msg[i]["last_ip"]+"</td>\
+</tr>");
+}
+           
+        });
 
-            if($( "#table_registered" ).length)
-            {
-                console.log("AllRobotRegistered");
-                $("#table_registered>tbody").prepend("<tr>\
-                <td data-label='UID'>"+data["uid"]+"</td>\
-                <td data-label='Name'>"+data["name"]+"</td>\
-                <td data-label='Registration'>0000</td>\
-                <td data-label='Last Connexion'>0000</td>\
-                <td data-label='IP'>0000000</td>\
-              </tr>");
-            }
+        socketio.on('AllLogs', (data) => {
             
-            
+            var msg = JSON.parse(data)
+            console.log("Logs "+msg[0]["comments"]);
+            DisplayLogs(msg);
+
         });
 
         socketio.on('authentification', (data) => {
@@ -106,12 +116,7 @@ function initWebSocket() {
     $("#guillaume_robot_connexion_status").addClass("check green ").removeClass("outline");
             }
               });
-
       });
-
-
-     
-    
 }
 
 
@@ -127,6 +132,12 @@ function GetAllRobotRegistered()
     socketio.emit('GetAllRobotRegistered', {});
 }
 
+
+function GetAllLogs()
+{
+    console.log("GetAllLogs");
+    socketio.emit('GetAllLogs', {});
+}
 
 function stopWebSocket() {
     if (socketio)
