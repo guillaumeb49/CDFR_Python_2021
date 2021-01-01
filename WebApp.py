@@ -22,7 +22,7 @@ import json
 import pickle
 from flask import g
 from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 #Database
 from flask_sqlalchemy import SQLAlchemy
@@ -72,6 +72,15 @@ def converter(obj):
     raise TypeError (f"{type(obj)} not datetime")
 
 
+def datetime_parser(dct):
+    for k, v in dct.items():
+        if isinstance(v, basestring) and re.search("\ UTC", v):
+            try:
+                dct[k] = datetime.datetime.strptime(v, DATE_FORMAT)
+            except:
+                pass
+    return dct
+
 def myconverter(o):
     if isinstance(o, datetime):
         return o.__str__()
@@ -79,8 +88,8 @@ def myconverter(o):
 
 class RobotStatusDBB(db.Model, SerializerMixin):
    id = db.Column(db.Integer, primary_key=True)
+   uid = db.Column(db.String(96), nullable=False)
    timestamp = db.Column(db.DateTime(),nullable=False)
-   robotid = db.Column(db.String(30), nullable=False)
    x = db.Column(db.Integer())
    y = db.Column(db.Integer())
    theta = db.Column(db.Integer())
@@ -91,8 +100,8 @@ class RobotStatusDBB(db.Model, SerializerMixin):
    distance5 = db.Column(db.Integer())
    distance6 = db.Column(db.Integer())
 
-   def __init__(self,timestamp_new, name, x_new, y_new,theta_new, distance1_new,distance2_new,distance3_new,distance4_new,distance5_new,distance6_new):
-      self.robotid = name
+   def __init__(self,uid_new, timestamp_new, x_new, y_new,theta_new, distance1_new,distance2_new,distance3_new,distance4_new,distance5_new,distance6_new):
+      self.uid = uid_new
       self.timestamp =  timestamp_new
       self.x = x_new
       self.y = y_new
@@ -136,13 +145,15 @@ class Logs(db.Model, SerializerMixin):
    uid   = db.Column(db.String(96), nullable=True)
    timestamp   = db.Column(db.DateTime(),nullable=False)
    event_type  = db.Column(db.String(30), nullable=False)
+   category  = db.Column(db.String(30), nullable=False)
    comments  = db.Column(db.String(255), nullable=False)
    by = db.Column(db.String(30), nullable=False)
 
-   def __init__(self, new_uid, new_timestamp, new_event_type, new_comments, new_by):
+   def __init__(self, new_uid, new_timestamp, new_event_type, new_category, new_comments, new_by):
       self.uid = new_uid
       self.timestamp =  new_timestamp
       self.event_type = new_event_type
+      self.category = new_category
       self.comments = new_comments
       self.by = new_by
 
@@ -172,7 +183,7 @@ def messageReceived(methods=['GET', 'POST']):
 @socketio.on('connect')
 def test_connect():
    print('Client connected sid:'+str(request.sid))
-   db.session.add(Logs(str(request.sid), datetime.datetime.now(),"connection", "Client connected on SocketIO", request.remote_addr))
+   db.session.add(Logs(str(request.sid), datetime.datetime.now(),"connection", "connection","Client connected on SocketIO", request.remote_addr))
    db.session.commit()
 
 @socketio.on('disconnect')
@@ -197,8 +208,9 @@ def authentification(msg):
 def AddRobotRegistered(data):
    if data['uid'] and data['name']:
       timestamp = datetime.datetime.now()
-      robotregistered = RobotRegistered(data['uid'], data['name'], timestamp, timestamp, "000.000.000.000")
+      robotregistered = RobotRegistered(data['uid'], data['name'], timestamp, timestamp, request.remote_addr)
       db.session.add(robotregistered)
+      db.session.add(Logs(str(request.sid), datetime.datetime.now(),"robot added","info", "New Robot Added ("+str(data['uid'])+")", request.remote_addr))
       db.session.commit()  
 
 @socketio.on('GetAllRobotRegistered')
@@ -213,13 +225,67 @@ def GetAllRobotRegistered(data):
 
 @socketio.on('GetAllLogs')
 def GetAllLogs(data):
-   logs = Logs.query.order_by(desc(Logs.timestamp)).limit(100).all()
+   filters_type = []
+   print(data)
+   if data["filter_connection"]:
+      filters_type.append("connection")
+
+   if data["filter_info"]:
+      filters_type.append("info")
+   
+   if data["filter_warning"]:
+      filters_type.append("warning")
+
+   if data["filter_critical"]:
+      filters_type.append("critical")
+
+   logs = Logs.query.filter(Logs.event_type.in_(filters_type)).order_by(desc(Logs.timestamp)).all()
    list = []
    for item in logs:
       list.append(item.to_dict().copy())
    
    socketio.emit('AllLogs', json.dumps(list,default=converter))
- 
+
+@socketio.on('GetRobotPosition')
+def GetRobotPosition(data):
+   filters_type = []
+   print("GetRobotPosition"+str(data))
+
+   robots_positions = RobotStatusDBB.query.filter_by(uid=data["uid"]).order_by(desc(RobotStatusDBB.timestamp)).limit(data["number"]).all()
+   list = []
+   for item in robots_positions:
+      list.append(item.to_dict().copy())
+   
+   socketio.emit('GetRobotPosition', json.dumps(list,default=converter))
+
+
+@socketio.on('UpdateRobotView')
+def UpdateRobotView(msg):
+   print("received UpdateRobotView request"+str(msg))
+   
+   # One robot sent a new position + status
+   # 1. Verify the UID is known
+   if {"UID", "timestamp", "x", "y", "theta", "distance1", "distance2", "distance3", "distance4", "distance5", "distance6"} <= msg.keys():
+      uid = RobotRegistered.query.filter_by(uid=msg["UID"]).first()
+      if uid is not None:
+         # 2. If UID is known, check when was the last data received
+         date_last_data = RobotStatusDBB.query.filter_by(uid=msg["UID"]).order_by(desc(RobotStatusDBB.timestamp)).first();
+         if date_last_data is None:
+            newtime = datetime.datetime.strptime(json.loads(msg["timestamp"], object_hook=datetime_parser), '%Y-%m-%dT%H:%M:%S.%f')
+            db.session.add(RobotStatusDBB(msg['UID'], newtime, msg['x'], msg['y'],msg['theta'], msg['distance1'], msg['distance2'], msg['distance3'], msg['distance4'], msg['distance5'], msg['distance6']))
+            socketio.emit('new_status_data', {"timestamp":msg['timestamp'], "UID":msg['UID'],"x": msg['x'], "y":msg['y'],"theta":msg['theta'], "distance1":msg['distance1'],"distance2":msg['distance2'],"distance3":msg['distance3'],"distance4":msg['distance4'],"distance5":msg['distance5'],"distance6":msg['distance6']})
+            db.session.commit() 
+         else: # 3. If data received less than 500ms ago, abort ==> Do not store / refresh ui more often than every 500ms
+            newtime = datetime.datetime.strptime(json.loads(msg["timestamp"], object_hook=datetime_parser), '%Y-%m-%dT%H:%M:%S.%f')
+            if int((newtime - date_last_data.timestamp).total_seconds()* 1000 ) >= 500:
+               # 4. If last data received more than 500ms ago, store and forward the info to UI to update 
+               db.session.add(RobotStatusDBB(msg['UID'], newtime, msg['x'], msg['y'],msg['theta'], msg['distance1'], msg['distance2'], msg['distance3'], msg['distance4'], msg['distance5'], msg['distance6']))
+               socketio.emit('new_status_data', {"timestamp":msg['timestamp'], "UID":msg['UID'],"x": msg['x'], "y":msg['y'],"theta":msg['theta'], "distance1":msg['distance1'],"distance2":msg['distance2'],"distance3":msg['distance3'],"distance4":msg['distance4'],"distance5":msg['distance5'],"distance6":msg['distance6']})
+               db.session.commit() 
+      else:
+         print("Error UID unknow")
+   else:
+      print("Error request UpdateRobotView. Bad data dict ")
 
 @app.route('/map/')
 def map():
@@ -241,7 +307,7 @@ def do_task():
    #If requested, add a new robot status to the database
    if request.json['taskID'] == 1:
       timestamp = datetime.now()
-      robot = RobotStatusDBB(timestamp,request.json['robotid'], request.json['x'], request.json['y'],request.json['theta'], request.json['distance 1'],request.json['distance 2'],request.json['distance 3'],request.json['distance 4'],request.json['distance 5'],request.json['distance 6'])
+      robot = RobotStatusDBB(timestamp,request.json['robotid'], request.json['x'], request.json['y'],request.json['theta'], request.json['distance1'],request.json['distance2'],request.json['distance3'],request.json['distance4'],request.json['distance5'],request.json['distance6'])
       db.session.add(robot)
       db.session.commit()
       
@@ -250,10 +316,10 @@ def do_task():
         'done': True
       }
       #warn connected clients UI could be updated with new status
-      socketio.emit('new_status_data', {"timestamp":json.dumps(timestamp,default = myconverter),"robotid":request.json['robotid'],"x": request.json['x'], "y":request.json['y'],"theta":request.json['theta'], "distance 1":request.json['distance 1'],"distance 2":request.json['distance 2'],"distance 3":request.json['distance 3'],"distance 4":request.json['distance 4'],"distance 5":request.json['distance 5'],"distance 6":request.json['distance 6']})
+      socketio.emit('new_status_data', {"timestamp":json.dumps(timestamp,default = myconverter),"robotid":request.json['robotid'],"x": request.json['x'], "y":request.json['y'],"theta":request.json['theta'], "distance1":request.json['distance1'],"distance2":request.json['distance2'],"distance3":request.json['distance3'],"distance4":request.json['distance4'],"distance5":request.json['distance5'],"distance6":request.json['distance6']})
       return jsonify({'tasks': task})
    else:
-      socketio.emit('new_status_data', {"robotid":request.json['robotid'],"x": request.json['x'], "y":request.json['y'],"theta":request.json['theta'], "distance 1":request.json['distance 1'],"distance 2":request.json['distance 2'],"distance 3":request.json['distance 3'],"distance 4":request.json['distance 4'],"distance 5":request.json['distance 5'],"distance 6":request.json['distance 6']})
+      socketio.emit('new_status_data', {"robotid":request.json['robotid'],"x": request.json['x'], "y":request.json['y'],"theta":request.json['theta'], "distance1":request.json['distance1'],"distance2":request.json['distance2'],"distance3":request.json['distance3'],"distance4":request.json['distance4'],"distance5":request.json['distance5'],"distance6":request.json['distance6']})
       return jsonify({'tasks': {
         'taskID': request.json['taskID'],
         'done': False

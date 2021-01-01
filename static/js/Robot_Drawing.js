@@ -62,7 +62,7 @@ class Sensor{
           ctx.fill();
 
           // Draw upper limit sensor
-          ctx.fillStyle = 'rgba(0,0,0,0.25)';
+          ctx.fillStyle = 'rgba(0,0,0,0.1)';
           ctx.beginPath();
           ctx.moveTo(this.x, this.y);
           ctx.arc(this.x,this.y,150,0*Math.PI,2*Math.PI,true);
@@ -209,7 +209,6 @@ class RobotDrawing
           canvas.height = 668+39.3;
       
 
-          // Draw upper limit sensor
           ctx.fillStyle = 'rgba(245, 171, 61, 0.87)';
                       
           ctx.beginPath();
@@ -346,3 +345,120 @@ class RobotDrawing
 
 }
 
+
+
+
+class RobotDrawingHistory
+{
+  x = 0;
+  y = 0;
+  theta = 0;
+
+  next_x = 0;
+  next_y = 0;
+  next_theta = 0;
+
+  size = 0;
+  size_flash = 0;
+  direction = 0;
+  name = "";
+
+  dx = 1;
+  dy = 1;
+  dtheta = 1;
+
+  list_position_history = [];
+
+  id_layer1   = ""; 
+  p_width  = 38.5;
+    p_height = 39.3;
+
+  constructor(new_name, new_size, id_layer1_new)
+  {
+      this.name = new_name;
+      this.size = new_size;
+
+      this.next_x = this.x;
+      this.next_y = this.y;
+      this.next_theta = this.theta;
+
+      this.id_layer1   = id_layer1_new; 
+
+  }
+
+  ConvertX(x)
+    {
+        return (this.p_width + x*1002/3000);
+    }
+
+    ConvertY(y)
+    {
+        return (this.p_height + y*668/2000);
+    }
+
+  Draw()
+  {
+      var canvas = document.getElementById(this.id_layer1);
+      if (canvas.getContext) 
+      {
+          var ctx = canvas.getContext('2d');
+          canvas.width = 1002+38.5;
+          canvas.height = 668+39.3;
+      
+          var old_x = -1;
+          var old_y = -1;
+          var j = 0;
+          var nb_points = 0;
+
+          for (var i=(this.list_position_history.length-1);i>=0;i--)
+          {
+  
+              ctx.beginPath();
+              ctx.lineWidth = 0;
+              ctx.arc(this.ConvertX(this.list_position_history[i].GetX()), this.ConvertY(this.list_position_history[i].GetY()), this.list_position_history[i].GetSize(), 0, 2*Math.PI);
+              ctx.fillStyle = this.list_position_history[i].GetColor();
+              ctx.globalAlpha = ((this.list_position_history.length-i)*0.75/this.list_position_history.length) + 0.25;
+              ctx.fill();
+
+              if((old_x == -1) && (old_y == -1))
+              {
+                  // If first element draw a start symbole
+                  ctx.beginPath();
+                  ctx.globalAlpha = 1;
+                  ctx.strokeStyle = 'rgba(235, 128, 52, 0.6)';
+                  ctx.lineWidth = 5;
+                  // if there is already a former point which can be connected to the new point
+                  ctx.moveTo(this.ConvertX(this.list_position_history[i].GetX()), this.ConvertY(this.list_position_history[i].GetY()))
+                  ctx.lineTo(this.ConvertX(old_x), this.ConvertY(old_y));
+                  ctx.stroke();
+              }  
+            else
+            {
+                ctx.beginPath();
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = 'rgba(235, 128, 52, 0.6)';
+                ctx.lineWidth = 5;
+                // if there is already a former point which can be connected to the new point
+                ctx.moveTo(this.ConvertX(this.list_position_history[i].GetX()), this.ConvertY(this.list_position_history[i].GetY()))
+                ctx.lineTo(this.ConvertX(old_x), this.ConvertY(old_y));
+                ctx.stroke();
+            }
+
+            old_x = this.list_position_history[i].GetX();
+            old_y = this.list_position_history[i].GetY();
+     
+        }
+        ctx.stroke();
+    }
+  }
+
+  AddPositionHistory(x,y)
+  {
+    this.list_position_history.push(new RobotItem(x,y,this.name));
+  }
+
+  EmptyPositionHistory()
+  {
+    this.list_position_history = [];
+  }
+}

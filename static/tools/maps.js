@@ -322,6 +322,14 @@ class Map{
 }
 
 
+function ConvertX(x)
+{
+    return (38.5 + x*1002/3000);
+}
 
+function ConvertY(y)
+{
+    return (39.3 + y*668/2000);
+}
 
 

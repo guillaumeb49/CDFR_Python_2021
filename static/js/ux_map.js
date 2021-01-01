@@ -6,6 +6,97 @@
  */
 
 
+$("#load_robots_position_btn").on("click", function(){
+
+   // load list of registered robots
+   GetAllRobotRegistered();
+
+  $('#Load_robot_position_modal').modal({
+    onDeny  : function(){
+      
+      $(this).modal('hide');
+      // Clear selection
+      $("#table_chronology>tbody tr").remove(); 
+      // clear canvas
+      var canvas  = document.getElementById("canvas_layer6_index")
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      return false;
+    },
+    onApprove:function(){
+
+      uid  = null;
+      $( ".robot_selection_checkbox" ).each(function( index ) {
+        if($( this ).checkbox('is checked'))
+        {
+          console.log("$( this+input).data('label') : "+$( this).find("input").data('label'));
+          return (uid = $( this).find("input").data('label'));
+        }
+      });
+
+      console.log("uid :"+uid);
+      if(uid != null)
+      {
+        GetRobotPosition(uid,$("#number_position_robot").val());
+      }
+      return true;
+    }
+  }).modal('show');
+});
+
+$("#download_history").on("click", function(){
+  var table = $('#table_chronology').toCSV(this);
+});
+
+
+
+
+function FormatListRobotPosition(msg)
+{
+   // Clear selection
+   $("#table_chronology>tbody tr").remove(); 
+
+   robot_history = new RobotDrawingHistory(msg[0]["name"], 12, "canvas_layer6_index");
+
+  for(var i = 0;i<msg.length;i++)
+  {
+    msg[i]["timestamp"] = new Date(msg[i]["timestamp"]);
+
+    $("#table_chronology>tbody").append("<tr>\
+    <td data-label='Timestamp'>"+msg[i]["timestamp"]+"</td>\
+    <td data-label='Robot'>"+msg[i]["uid"]+"</td>\
+    <td data-label='Position'>x:"+msg[i]["x"]+" y:"+msg[i]["y"]+" theta:"+msg[i]["theta"]+"</td>\
+    <td data-label='Distance'>"+msg[i]["distance1"]+","+msg[i]["distance2"]+","+msg[i]["distance3"]+","+msg[i]["distance4"]+","+msg[i]["distance5"]+","+msg[i]["distance6"]+"</td>\
+    </tr>");
+    robot_history.AddPositionHistory(msg[i]["x"],msg[i]["y"]);
+  }
+  robot_history.Draw();
+}
+
+function FormatListRegisteredRobots(msg)
+{
+  console.log("FormatListRegisteredRobots + "+msg.length)
+  // Clear selection
+  $("#map_table_registered>tbody tr").remove(); 
+
+  
+  for(var i = 0;i<msg.length;i++)
+  {
+    $("#map_table_registered>tbody").append("<tr>\
+    <td class='collapsing'>\
+          <div class='robot_selection_checkbox ui fitted slider checkbox'>\
+            <input type='checkbox' data-label='"+msg[i]["uid"]+"'> <label></label>\
+          </div>\
+        </td>\
+    <td data-label='Name'>"+msg[i]["name"]+"</td>\
+    <td data-label='UID'>"+msg[i]["uid"]+"</td>\
+    </tr>");
+  }
+
+  
+}
+
+
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   var x = ((evt.clientX - rect.left) -g_offset_x)*3000/(1002+g_offset_x-34);
@@ -38,47 +129,14 @@ map.AddItem("Item2", 1730,1200,10,"Test 2",'#bb1e10');
 map.DrawItems();
 
 
-map.AddRobotItem("Guillaume", 500,500);
-map.AddRobotItem("Guillaume", 600,600);
-map.AddRobotItem("Guillaume", 700,700);
-map.AddRobotItem("Guillaume", 750,700);
-map.AddRobotItem("Guillaume", 800,700);
-map.AddRobotItem("Guillaume", 850,700);
-map.AddRobotItem("Guillaume", 900,700);
-map.AddRobotItem("Guillaume", 950,700);
-map.AddRobotItem("Guillaume", 1000,700);
-map.AddRobotItem("Guillaume", 1050,700);
-map.AddRobotItem("Guillaume", 1200,700);
-map.AddRobotItem("Guillaume", 1250,750);
-map.AddRobotItem("Guillaume", 1400,800);
-map.AddRobotItem("Guillaume", 1600,900);
-map.AddRobotItem("Guillaume", 1700,1000);
-map.AddRobotItem("Guillaume", 1700,1400);
-map.AddRobotItem("Guillaume", 1750,1600);
-map.AddRobotItem("Guillaume", 1600,1200);
-map.AddRobotItem("Guillaume", 500,800);
-map.AddRobotItem("Guillaume", 500,900);
-map.AddRobotItem("Guillaume", 500,1000);
-map.AddRobotItem("Guillaume", 500,1100);
-map.AddRobotItem("Guillaume", 500,1200);
-map.AddRobotItem("Guillaume", 500,1400);
-map.AddRobotItem("Guillaume", 500,1600);
-map.AddRobotItem("Guillaume", 500,1800);
-map.AddRobotItem("Guillaume", 700,1000);
-map.AddRobotItem("Guillaume", 800,1100);
-map.AddRobotItem("Guillaume", 1000,1100);
-map.AddRobotItem("Guillaume", 1100,1100);
-map.AddRobotItem("Guillaume", 1500,1100);
-map.AddRobotItem("Guillaume", 2000,1100);
-
-
 MapEventManager();
 
 var robotdrawing = new RobotDrawing("Guillaume", 200, 250, 0, 0,"canvas_layer5_index");
 
+robotdrawing.MoveTo(ConvertX(1500),ConvertY(1000),45);
 robotdrawing.Animate();
 
-robotdrawing.MoveTo(500,355,180);
+
 
 
 

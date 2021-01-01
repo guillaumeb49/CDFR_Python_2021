@@ -57,44 +57,55 @@ function initWebSocket() {
             {
                 $("#table_chronology>tbody").prepend("<tr>\
                 <td data-label='TimeStamp'>"+data["timestamp"]+"</td>\
-                <td data-label='Robot'>"+data["robotid"]+"</td>\
+                <td data-label='Robot'>"+data["UID"]+"</td>\
                 <td data-label='Position'>x:"+data["x"]+" y:"+data["y"]+" theta:"+data["theta"]+"</td>\
-                <td data-label='Distance'>"+data["distance 1"]+data["distance 2"]+data["distance 3"]+data["distance 4"]+data["distance 5"]+data["distance 6"]+"</td>\
+                <td data-label='Distance'>"+data["distance1"]+data["distance2"]+data["distance3"]+data["distance4"]+data["distance5"]+data["distance6"]+"</td>\
               </tr>");
             }
             
-            DrawRobotPosition(data["x"],data["y"],old_x,old_y)
-            old_x = data["x"];
-            old_y = data["y"];
+            //DrawRobotPosition(data["x"],data["y"],old_x,old_y)
+            //old_x = data["x"];
+            //old_y = data["y"];
             console.log(data);
+            robotdrawing.MoveTo(data["x"],data["y"],data["theta"]);
         });
 
 
         socketio.on('AllRobotRegistered', (data) => {
-            
             var msg = JSON.parse(data)
+            
+            FormatListRegisteredRobots(msg);
+
             console.log("AllRobotRegistered "+msg[0]["uid"]);
             $("#table_registered>tbody tr").remove(); 
-for(var i = 0;i<msg.length;i++)
-{
-    msg[i]["timestamp_registration"] = new Date(msg[i]["timestamp_registration"]);
-    msg[i]["timestamp_lastconnexion"] = new Date(msg[i]["timestamp_lastconnexion"]);
-    $("#table_registered>tbody").append("<tr>\
-    <td data-label='UID'>"+msg[i]["uid"]+"</td>\
-    <td data-label='Name'>"+msg[i]["name"]+"</td>\
-    <td data-label='Registration'>"+msg[i]["timestamp_registration"].toLocaleString("fr-FR")+"</td>\
-    <td data-label='Last Connexion'>"+msg[i]["timestamp_lastconnexion"].toLocaleString("fr-FR")+"</td>\
-    <td data-label='IP'>"+msg[i]["last_ip"]+"</td>\
-</tr>");
-}
+            for(var i = 0;i<msg.length;i++)
+            {
+                msg[i]["timestamp_registration"] = new Date(msg[i]["timestamp_registration"]);
+                msg[i]["timestamp_lastconnexion"] = new Date(msg[i]["timestamp_lastconnexion"]);
+
+                $("#table_registered>tbody").append("<tr>\
+                <td data-label='UID'>"+msg[i]["uid"]+"</td>\
+                <td data-label='Name'>"+msg[i]["name"]+"</td>\
+                <td data-label='Registration'>"+msg[i]["timestamp_registration"].toLocaleString("fr-FR")+"</td>\
+                <td data-label='Last Connexion'>"+msg[i]["timestamp_lastconnexion"].toLocaleString("fr-FR")+"</td>\
+                <td data-label='IP'>"+msg[i]["last_ip"]+"</td>\
+            </tr>");
+            }
            
         });
 
         socketio.on('AllLogs', (data) => {
             
             var msg = JSON.parse(data)
-            console.log("Logs "+msg[0]["comments"]);
             DisplayLogs(msg);
+
+        });
+
+        socketio.on('GetRobotPosition', (data) => {
+            
+            var msg = JSON.parse(data)
+            console.log("GetRobotPosition + "+msg);
+            FormatListRobotPosition(msg);
 
         });
 
@@ -120,6 +131,12 @@ for(var i = 0;i<msg.length;i++)
 }
 
 
+function GetRobotPosition(uid,number)
+{
+    console.log("GetRobotPosition( "+uid+", "+number+")");
+    socketio.emit('GetRobotPosition', {'uid': uid, 'number':number});
+}
+
 function AddRobotRegistered(name, uid)
 {
     console.log("AddRobotRegistered( "+name+", "+uid+")");
@@ -133,10 +150,10 @@ function GetAllRobotRegistered()
 }
 
 
-function GetAllLogs()
+function GetAllLogs(type_connection, type_info, type_warning, type_critical, start_date, end_date)
 {
     console.log("GetAllLogs");
-    socketio.emit('GetAllLogs', {});
+    socketio.emit('GetAllLogs', {filter_connection:type_connection ,filter_info: type_info, filter_warning: type_warning, filter_critical: type_critical,start_date, end_date});
 }
 
 function stopWebSocket() {
