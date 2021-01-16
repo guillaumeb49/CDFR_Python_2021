@@ -136,7 +136,7 @@ class lowLevelCom :
         while len(self.questions) > 0 :
             ans = self.exchangeTCP_Frame(self.questions[0])
             self.questions.pop(0)
-            print(ans)      
+            print(ans)     
 
 if __name__ == '__main__':
     marioBot = Robot_Interface()
@@ -159,4 +159,4 @@ if __name__ == '__main__':
             marioBot.setManualCtrl(c)
         else :
             marioBot.endCom()
-            exit()            
+            exit()      

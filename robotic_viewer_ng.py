@@ -1,12 +1,12 @@
 # This Python file uses the following encoding: utf-8
 import sys
 import numpy as np
-from PySide2.QtWidgets  import QMainWindow, QApplication, QGridLayout
-from PySide2.QtWidgets  import QLabel, QPushButton, QLineEdit, QWidget, QSlider
-from PySide2.QtWidgets  import QGroupBox, QVBoxLayout, QComboBox
-from PySide2.QtGui      import QPixmap, QImage, QIcon, QPainter, QBrush,QColor
-from PySide2.QtGui      import QPen, QTransform, QPolygon
-from PySide2.QtCore     import QObject,QRect, Signal, Slot, QPoint, QTimer, Qt
+from PySide6.QtWidgets  import QMainWindow, QApplication, QGridLayout
+from PySide6.QtWidgets  import QLabel, QPushButton, QLineEdit, QWidget, QSlider
+from PySide6.QtWidgets  import QGroupBox, QVBoxLayout, QComboBox
+from PySide6.QtGui      import QPixmap, QImage, QIcon, QPainter, QBrush,QColor
+from PySide6.QtGui      import QPen, QTransform, QPolygon
+from PySide6.QtCore     import QObject,QRect, Signal, Slot, QPoint, QTimer, Qt
 
 from robotic_brain  import Strategy, Action
 from robotic_simu   import VirtualRobot
@@ -32,7 +32,7 @@ class Robotic_Viewer_NG(QMainWindow):
         self.rythmSim.timeout.connect(self.simulationStep)
         self.buildGameElements()
         ## Configuration des widgets
-        self.mapPx = QImage('TableCDFR2020.png').scaledToWidth(self.width()*2/3,aspectmode='KeepAspectRatio')
+        self.mapPx = QImage('TableCDFR2020.png').scaledToWidth(self.width()*2/3)
         self.scaleFactor = 300/self.mapPx.width()
         self.buildSettingsGroupBox(self.settingsWidget)
         self.settingsWidget.setStyleSheet("background: '#94e4f7';")

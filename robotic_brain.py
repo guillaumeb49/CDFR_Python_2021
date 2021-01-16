@@ -127,7 +127,7 @@ class Strategy:
         if stopNeeded :
             a=robot.getPosition()
         else :
-            if robot.isArrived() and l_nbToDo > 0 and not('Init' in l_currentActionID):
+            if robot.isArrived() and (l_nbToDo > 0) and not('Init' in l_currentActionID):
                 print(f"{robot.getID()}\t a terminé l'action {l_currentActionID}.")
                 self.actionsMade.append(l_currentActionID)
                 self.removeAction(l_currentActionID)
