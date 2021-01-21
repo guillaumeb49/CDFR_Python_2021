@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="float: right;margin-right:20px" >
+  <div class="ui small basic icon buttons">
+    <button id="add_new_robot" class="ui big button"><i class="add big green icon"></i></button>
+    <button class="ui big button"><i class="pencil alternate big orange icon"></i></button>
+    <button class="ui big button"><i class="remove big red icon"></i></button>
+    <button id="lookfor_registered_robot" class="ui big button"><i class="zoom-in big icon"></i></button>
+    <button class="ui big button"><i class="download big blue icon"></i></button>
+  </div>
+
+  <div style="margin-top:10px;padding-left:10px" class="">
+    
+    <h3 style="text-align:center">Filters</h3>
+      <div id="filters_checkbox_connection" class="ui toggle checkbox">
+        <input type="checkbox" name="filters_checkbox_connection">
+        <label><i class="sign-in blue icon"></i> Connection</label>
+        
+      </div>
+    <br/>
+    <br/>
+      <div id="filters_checkbox_info" class="ui toggle checkbox">
+        <input type="checkbox" name="filters_checkbox_info">
+        <label><i class="info yellow icon"></i> Info</label>
+      </div>
+      <br/>
+      <br/>
+      <div id="filters_checkbox_warning" class="ui toggle checkbox">
+        <input type="checkbox" name="filters_checkbox_warning">
+        <label><i class="warning orange icon"></i> Warning</label>
+      </div>
+      <br/>
+    <br/>
+      <div id="filters_checkbox_critical" class="ui toggle checkbox">
+        <input type="checkbox" name="filters_checkbox_critical">
+        <label><i class="exclamation triangle red icon"></i> Critical</label>
+      </div>
+
+      <h3 style="text-align:center">Between</h3>
+      <div class="ui">
+        <label><i class="hourglass start grey icon"></i> start</label>
+        <input type="date" id="filter_start_date" name="filter_start_date">
+      </div>
+      <br/>
+      <br/>
+      <div class="ui">
+        <label><i class="hourglass end grey icon"></i> end</label>
+        <input type="date" id="filter_end_date" name="filter_end_date">
+      </div>
+      <br/>
+      <br/>
+      <div style="text-align:center">
+      <button id="apply_filters_button" class="ui labeled green icon button">
+        <i class="sync  icon"></i>
+        Refresh
+      </button>
+    </div>
+    
+    </div>
+
+
+</div>
+
+
+
+<h1 style="margin-top:20px;" class="ui header centered">Logs</h1>
+<br/>
+<div  class="ui column centered grid">
+<div id="logs">
+  <div>
+
+</div>
+
+<div class="ui hidden divider"></div>
+    
+
+    
+    
+
+{% endblock %}
+
+
+

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+    
+<div style="float: right;margin-right:20px" >
+    <div class="ui small basic icon buttons">
+      <button id="load_robots_position_btn" class="ui big button"><i class="zoom-in big icon"></i></button>
+      <button id="download_history" class="ui big button"><i class="download big blue icon"></i></button>
+    </div>
+</div>
+
+
+
+    <br />
+    <br />
+    <br />
+
+    <div class="ui column centered grid">
+
+        <div id="viewport">
+            <canvas id="canvas_layer1_index" style="z-index: 1;"></canvas>
+            <canvas id="canvas_layer2_index" style="z-index: 2;"></canvas>  
+            <canvas id="canvas_layer3_index" style="z-index: 3;"></canvas>
+            <canvas id="canvas_layer4_index" style="z-index: 4;"></canvas>   
+            <canvas id="canvas_layer5_index" style="z-index: 5;"></canvas>
+            <canvas id="canvas_layer6_index" style="z-index: 6;"></canvas>   
+        </div>
+   
+    </div>
+
+    <br/><br/>
+    <div class="ui column centered grid">
+         X: <span id="x_on_map_index" style="padding-right: 35px">0</span> Y: <span id="y_on_map_index" style="padding-right: 35px">0</span>
+    </div>
+
+
+    <div class="ui column centered grid">
+        <table id="table_chronology" class="ui celled table">
+            <thead>
+              <tr><th>TimeStamp</th>
+              <th>Robot</th>
+              <th>Position</th>
+              <th>Distance</th>
+            </tr></thead>
+            <tbody id="body_chronology">
+              
+            </tbody>
+          </table>
+    </div>
+
+    <div id="Load_robot_position_modal" class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+          Load robot positions
+        </div>
+        <div class="image content">
+          <div class="ui small image">
+            <img src="{{ url_for('static', filename='img/mario_robot.png') }}">
+          </div>
+          <div class="description">
+            <div class="ui header">Load positions</div>
+            <p>Select a robot and the number of positions to be loaded on the map <br/>
+            
+            <div class="ui fluid left action input">
+                
+              <button class="ui yellow icon button">
+                <i class="backward icon"></i>
+              </button>
+              <input id="number_position_robot" type="number" value="" placeholder="100">
+            </div>
+  
+            <br/>
+            <div class="ui fluid scrolling content"> 
+                <table id="map_table_registered" class="ui celled table definition">
+                  <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>UID</th>
+                  </tr></thead>
+                  <tbody id="body_map_table_registered">
+                    
+                  </tbody>
+                </table>
+              </div>
+  
+          </div>
+  
+          
+        </div>
+        <div class="actions">
+          <div style="float: left;" class="ui red deny right labeled icon button">
+            Clear Map
+            <i class="stop icon"></i>
+          </div>
+          <div class="ui positive right labeled icon button">
+            Play
+            <i class="play icon"></i>
+          </div>
+        </div>
+      </div>
+    
+
+{% endblock %}
+
+
+

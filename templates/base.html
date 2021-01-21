@@ -1,0 +1,148 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>C-Bot Robot 1</title>
+  <meta name="description" content="CBOT² - French Robotics Cup">
+  <meta name="author" content="CBOT²">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic/dist/semantic.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo_cbot.png') }}" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.min.js" integrity="sha512-Bkf3qaV86NxX+7MyZnLPWNt0ZI7/OloMlRo8z8KPIEUXssbVwB1E0bWVeCvYHjnSPwh4uuqDryUnRdcUw6FoTg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js" integrity="sha512-XmZS54be9JGMZjf+zk61JZaLZyjTRgs41JLSmx5QlIP5F+sSGIyzD2eJyxD4K6kGGr7AsVhaitzZ2WTfzpsQzg==" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='semantic/dist/semantic.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js" integrity="sha512-AcZyhRP/tbAEsXCCGlziPun5iFvcSUpEz2jKkx0blkYKbxU81F+iq8FURwPn1sYFeksJ+sDDrI5XujsqSobWdQ==" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='tools/alert_ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/Robot_Class.js') }}"></script>
+
+</head>
+
+<body class="Site">
+
+  <header>
+    <div class="ui fixed inverted menu">
+        <div class="ui container">
+          <a href="#" class="header item">
+            <img class="logo" src="{{ url_for('static', filename='img/logo_cbot.png') }}">
+            C-Bot²
+          </a>
+          <a {% if request.url_rule.endpoint == "index" %} class="item active"{% endif %} href="/" class="item">Game!</a>
+          <a {% if request.url_rule.endpoint == "map" %} class="item active"{% endif %} href="/map/" class="item">Map</a>
+          <!--<a {% if request.url_rule.endpoint == "video_feed" %} class="item active"{% endif %} href="/video_feed/" class="item">Vision</a>-->
+          <a {% if request.url_rule.endpoint == "myrobots" %} class="item active"{% endif %} href="/myrobots/" class="item">My Robots</a>
+          <a {% if request.url_rule.endpoint == "admin" %} class="item active"{% endif %} href="/admin/" class="item">Admin</a>
+        </div>
+
+
+        <div class="right menu">
+          <a class="item" id="menu_connection_status">
+            <div id="connection_status_bubble" class="ui red empty circular horizontal label"></div>
+            Status
+          </a>
+          <a class="ui item" id="menu_debug">
+            <i class="question circle outline icon"></i> <b>Debug</b>
+          </a>
+        </div>
+    </div>
+  </header>
+
+  <p><br/><br/></p>
+
+  <main class="Site-content">
+
+    {% block content %}
+    {% endblock %}
+
+  </main>
+
+  <p><br/><br/><br/><br/></p>
+
+  <footer>
+    <div class="ui inverted vertical footer segment">
+      <div class="ui center aligned container">
+        <div class="ui stackable inverted divided grid">
+        </div>
+        <div class="ui inverted section divider"></div>
+        <img src="{{ url_for('static', filename='img/logo_cbot.png') }}" class="ui centered mini image">
+        <p><br/><b>C-BOT² 2020</b></p>
+      </div>
+    </div> 
+  </footer>     
+
+
+  <div id="modal_debug_menu" class="ui basic modal">
+    <div class="ui icon header">
+      <i class="bug icon"></i>
+      Debug
+    </div>
+    <div class="header">Header</div>
+    <div class="scrolling content">
+      <div id="debugTextArea"></div>
+
+    </div>
+    <div class="actions">
+      <div class="ui red basic cancel inverted button">
+        <i class="close icon"></i>
+        Close
+      </div>
+    </div>
+  </div>
+
+
+</body>
+
+
+<!--
+  If index page -> Draw the Map 
+-->
+{% if request.url_rule.endpoint == "index" %}
+  <script src="{{ url_for('static', filename='js/ux_index.js') }}"></script>
+{% endif %}
+
+{% if request.url_rule.endpoint == "map" %}
+  <script src="{{ url_for('static', filename='js/Robot_Drawing.js') }}"></script>
+  <script src="{{ url_for('static', filename='tools/maps.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ux_map.js') }}"></script>
+{% endif %}
+
+
+{% if request.url_rule.endpoint == "tests" %}
+  <script src="{{ url_for('static', filename='js/ux_tests.js') }}"></script>
+{% endif %}
+
+{% if request.url_rule.endpoint == "myrobots" %}
+  <script src="{{ url_for('static', filename='js/ux_myrobots.js') }}"></script>
+{% endif %}
+
+{% if request.url_rule.endpoint == "admin" %}
+  <script src="{{ url_for('static', filename='js/ux_admin.js') }}"></script>
+{% endif %}
+
+<!-- Always run these functions-->
+
+<script src="{{ url_for('static', filename='js/ux_base.js') }}"></script>
+<script src="{{ url_for('static', filename='tools/WebSocket.js') }}"></script>
+
+<script type="text/javascript">
+
+  // initialize the websockets
+  initWebSocket();
+  
+</script>
+
+</html>
+
+
+

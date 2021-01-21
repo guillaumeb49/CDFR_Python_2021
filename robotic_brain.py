@@ -1,5 +1,7 @@
+
 import numpy as np
 from robotic_basics import Point, Rect, State
+
 
 class Strategy:
     def __init__(self):
@@ -175,3 +177,16 @@ class Action(State):
 
     def setGain(self, gain):
         self.price = gain
+
+    def ShareRobotsUI(self):
+
+    def GetInputUI(self):
+
+
+
+
+
+if __name__ == "__main__":
+   
+
+   
